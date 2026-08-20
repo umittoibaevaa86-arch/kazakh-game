@@ -1,0 +1,1616 @@
+
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Үндестік Заңы - Space Academy</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        harmonyMint: '#4ADE80',
+                        harmonyAmber: '#FBBF24',
+                        harmonyViolet: '#A855F7',
+                        spaceCyan: '#22D3EE',
+                        spaceBlue: '#38BDF8',
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-fast': 'pulse 1.2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Montserrat:wght@400;600;750;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #0b1528 0%, #030712 70%, #010208 100%);
+            overflow-x: hidden;
+            position: relative;
+        }
+        .header-title {
+            font-family: 'Comfortaa', cursive;
+        }
+        
+        /* Interactive Star Dust Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            opacity: 0.45;
+            animation: spaceScroll 120s linear infinite;
+        }
+
+        @keyframes spaceScroll {
+            from { background-position: 0 0, 40px 60px, 130px 270px; }
+            to { background-position: 550px 1100px, 400px 760px, 1130px 1270px; }
+        }
+
+        /* Float Animation for UI Cards */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-card-float {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        /* Kid-friendly Premium Glassmorphism Cards with 24px (rounded-3xl) corners */
+        .premium-glass {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(56, 189, 248, 0.45); /* Bright Cyan-Blue Border */
+            box-shadow: 0 12px 40px 0 rgba(14, 165, 233, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .premium-glass:hover {
+            border-color: rgba(34, 211, 238, 0.8);
+            box-shadow: 0 16px 45px 0 rgba(34, 211, 238, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* 40% Brighter Mission Panel Style (Cyan Gradient #22D3EE → #67E8F9) */
+        .mission-panel-bright {
+            background: linear-gradient(135deg, #22D3EE 0%, #67E8F9 100%);
+            border: 2px solid #E0F2FE;
+            box-shadow: 0 10px 30px rgba(34, 211, 238, 0.45);
+            color: #030712;
+            border-radius: 24px;
+        }
+
+        /* 40% Brighter Question Card Style (Bright Blue Gradient #38BDF8 → #60A5FA) */
+        .question-card-bright {
+            background: linear-gradient(135deg, #38BDF8 0%, #60A5FA 100%);
+            border: 2.5px solid #FFFFFF;
+            box-shadow: 0 12px 35px rgba(56, 189, 248, 0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+            border-radius: 24px;
+            color: #FFFFFF;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* SPECIFIED GLOW ENGINES */
+        /* Mint Green Glow (#4ADE80) */
+        .glow-mint {
+            box-shadow: 0 0 25px rgba(74, 222, 128, 0.45);
+            border-color: rgba(74, 222, 128, 0.85) !important;
+        }
+        .glow-mint:hover {
+            box-shadow: 0 0 35px rgba(74, 222, 128, 0.7);
+        }
+        
+        /* Amber Yellow Glow (#FBBF24) */
+        .glow-amber {
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.45);
+            border-color: rgba(251, 191, 36, 0.85) !important;
+        }
+        .glow-amber:hover {
+            box-shadow: 0 0 35px rgba(251, 191, 36, 0.7);
+        }
+
+        /* Violet Glow (#A855F7) */
+        .glow-violet {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+            border-color: rgba(168, 85, 247, 0.85) !important;
+        }
+        .glow-violet:hover {
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.7);
+        }
+
+        .text-glow-cyan {
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+        }
+        .text-glow-purple {
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+        }
+
+        /* Vortex animation rotation speed */
+        .vortex-animate {
+            animation: vortex 8s linear infinite;
+        }
+        @keyframes vortex {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Particles canvas layer */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Background Nebula cloud layers */
+        .nebula {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(56, 189, 248, 0.05) 50%, transparent 100%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: -3;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col justify-between overflow-x-hidden pb-6">
+
+    <!-- Ambient Space Elements -->
+    <div class="stars"></div>
+    <div class="nebula top-1/4 left-1/4"></div>
+    <div class="nebula bottom-1/4 right-1/4" style="background: radial-gradient(circle, rgba(34, 211, 238, 0.12) 0%, rgba(168, 85, 247, 0.03) 60%, transparent 100%);"></div>
+    
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="premium-glass sticky top-0 z-50 px-5 py-4 mx-4 my-3 shadow-2xl flex items-center justify-between border-cyan-400/30">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-harmonyViolet to-spaceCyan p-3 rounded-2xl shadow-lg shadow-purple-500/20 animate-pulse">
+                <i class="fa-solid fa-space-shuttle text-xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="header-title text-lg md:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-spaceCyan via-spaceBlue to-harmonyMint text-glow-cyan">
+                    Space Academy
+                </h1>
+                <p class="text-[9px] text-cyan-300 font-extrabold tracking-widest uppercase">Үндестік заңы лабораториясы</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-4">
+            <!-- Streak Indicator -->
+            <div class="flex items-center gap-1.5 bg-slate-900/90 border-2 border-amber-400 px-3 py-1.5 rounded-2xl shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                <i class="fa-solid fa-fire text-amber-400 text-sm md:text-base animate-bounce-slow"></i>
+                <span class="text-xs font-black text-amber-300" id="streakVal">🔥 3 Күн</span>
+            </div>
+
+            <!-- Level progress widget -->
+            <div class="hidden md:flex flex-col gap-1 w-36">
+                <div class="flex justify-between text-[10px] font-bold text-slate-300 px-1">
+                    <span id="userLevel">Ранг: 1 (Кадет)</span>
+                    <span id="levelProgress" class="text-spaceCyan">0%</span>
+                </div>
+                <div class="w-full bg-slate-950/80 rounded-full h-2.5 border border-cyan-500/30 overflow-hidden">
+                    <div id="levelProgressBar" class="bg-gradient-to-r from-harmonyViolet via-spaceBlue to-spaceCyan h-full w-0 transition-all duration-500 shadow-[0_0_10px_#22D3EE]"></div>
+                </div>
+            </div>
+
+            <!-- XP Terminal -->
+            <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-2xl border-2 border-harmonyViolet shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                <i class="fa-solid fa-atom text-harmonyViolet text-xs md:text-sm animate-spin-slow"></i>
+                <span class="text-xs font-extrabold text-slate-200">Энергия: <span id="xpCount" class="text-white font-black text-sm">0</span> XP</span>
+            </div>
+            
+            <!-- Sound Toggle -->
+            <button id="soundBtn" onclick="toggleSound()" class="p-2.5 rounded-xl bg-slate-950/70 border border-cyan-500/30 hover:border-cyan-400 hover:bg-slate-900 transition-all text-slate-300">
+                <i class="fa-solid fa-volume-high text-xs md:text-sm" id="soundIcon"></i>
+            </button>
+            
+            <!-- Rules Help -->
+            <button onclick="showRulesModal()" class="p-2.5 rounded-xl bg-cyan-950/50 border border-cyan-500/50 hover:bg-cyan-900/50 transition-all text-cyan-300">
+                <i class="fa-solid fa-book-open-reader text-xs md:text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN GAME AREA -->
+    <main class="flex-grow container mx-auto px-4 max-w-4xl py-3 flex flex-col justify-center">
+        
+        <!-- DASHBOARD & JOURNEY MAP -->
+        <div id="gameMenu" class="flex flex-col gap-6 py-4">
+            
+            <!-- Mission Briefing Panel (Cyan gradient #22D3EE → #67E8F9) -->
+            <div class="mission-panel-bright p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden animate-card-float">
+                <div class="absolute -right-10 -top-10 text-cyan-200/30 text-9xl pointer-events-none"><i class="fa-solid fa-user-astronaut"></i></div>
+                <div class="max-w-xl text-center md:text-left">
+                    <span class="bg-cyan-950 text-white font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Орталық бұйрық • Mission Terminal</span>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tight mb-2 uppercase text-slate-950">
+                        Ғарыштық Фонетика Академиясы! 🚀
+                    </h2>
+                    <p class="text-slate-900 font-semibold text-xs md:text-sm leading-relaxed">
+                        Құрметті кадет! Қазақ тілінің Үндестік заңын зерттейтін ғарыштық экспедицияға қосыл. Деңгейлерден өтіп, жұлдызды энергия жина және өз біліміңді Шексіз AI залында сынап көр!
+                    </p>
+                </div>
+                <!-- Interactive Action Button -->
+                <button onclick="showRulesModal()" class="bg-slate-950 hover:bg-slate-900 text-white font-bold px-6 py-3.5 rounded-2xl text-xs uppercase tracking-widest transition-all hover:scale-105 shadow-xl whitespace-nowrap">
+                    <i class="fa-solid fa-shield-halved mr-1 text-spaceCyan"></i> Ережені оқу
+                </button>
+            </div>
+
+            <!-- STAGE JOURNEY MAP -->
+            <div class="premium-glass p-6 md:p-8 relative overflow-hidden">
+                <h3 class="text-xs font-black text-spaceCyan uppercase tracking-widest mb-6 flex items-center gap-2 text-glow-cyan">
+                    <i class="fa-solid fa-map-location-dot animate-bounce"></i> Тікелей Саяхат бағыттары (Interactive Map)
+                </h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-5 md:gap-3 relative py-4 text-center">
+                    
+                    <!-- Node 1 -->
+                    <div onclick="startGame(1)" class="group flex flex-col items-center cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-spaceBlue to-harmonyViolet border-2 border-white flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(56,189,248,0.4)] group-hover:scale-110 group-hover:shadow-[0_0_30px_#38BDF8] transition-all duration-300">
+                            <i class="fa-solid fa-arrows-left-right text-lg"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-2.5 mt-3 w-full transition-all group-hover:border-spaceCyan">
+                            <h4 class="text-[10px] font-black text-slate-100 uppercase">1. Свайп</h4>
+                            <p class="text-[8px] text-spaceCyan mt-0.5 font-black">Жуан-Жіңішке</p>
+                        </div>
+                    </div>
+
+                    <!-- Node 2 -->
+                    <div onclick="startGame(2)" class="group flex flex-col items-center cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-harmonyViolet to-pink-500 border-2 border-white flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(168,85,247,0.4)] group-hover:scale-110 group-hover:shadow-[0_0_30px_#A855F7] transition-all duration-300">
+                            <i class="fa-solid fa-puzzle-piece text-lg"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-2.5 mt-3 w-full transition-all group-hover:border-spaceCyan">
+                            <h4 class="text-[10px] font-black text-slate-100 uppercase">2. Шайқас</h4>
+                            <p class="text-[8px] text-pink-400 mt-0.5 font-black">Жалғаулар</p>
+                        </div>
+                    </div>
+
+                    <!-- Node 3 -->
+                    <div onclick="startGame(3)" class="group flex flex-col items-center cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-spaceBlue to-spaceCyan border-2 border-white flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(34,211,238,0.4)] group-hover:scale-110 group-hover:shadow-[0_0_30px_#22D3EE] transition-all duration-300">
+                            <i class="fa-solid fa-shuffle text-lg"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-2.5 mt-3 w-full transition-all group-hover:border-spaceCyan">
+                            <h4 class="text-[10px] font-black text-slate-100 uppercase">3. Портал</h4>
+                            <p class="text-[8px] text-spaceCyan mt-0.5 font-black">Ықпалдар</p>
+                        </div>
+                    </div>
+
+                    <!-- Node 4 -->
+                    <div onclick="startGame(4)" class="group flex flex-col items-center cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-pink-600 to-harmonyViolet border-2 border-white flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(219,39,119,0.4)] group-hover:scale-110 group-hover:shadow-[0_0_30px_#DB2777] transition-all duration-300">
+                            <i class="fa-solid fa-user-ninja text-lg"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-2.5 mt-3 w-full transition-all group-hover:border-spaceCyan">
+                            <h4 class="text-[10px] font-black text-slate-100 uppercase">4. Импостор</h4>
+                            <p class="text-[8px] text-pink-400 mt-0.5 font-black">Қатесін тап</p>
+                        </div>
+                    </div>
+
+                    <!-- Node 5 -->
+                    <div onclick="startGame(5)" class="group flex flex-col items-center cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-purple-600 to-indigo-800 border-2 border-white flex items-center justify-center text-white font-black text-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] group-hover:scale-110 group-hover:shadow-[0_0_30px_#6366F1] transition-all duration-300">
+                            <i class="fa-solid fa-gears text-lg"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-2.5 mt-3 w-full transition-all group-hover:border-spaceCyan">
+                            <h4 class="text-[10px] font-black text-slate-100 uppercase">5. Конструктор</h4>
+                            <p class="text-[8px] text-indigo-400 mt-0.5 font-black">Құрастыру</p>
+                        </div>
+                    </div>
+
+                    <!-- Node 6 (Gemini Integration) -->
+                    <div onclick="startGame(6)" class="group flex flex-col items-center cursor-pointer transition-all">
+                        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-harmonyViolet via-pink-500 to-spaceCyan border-2 border-white flex items-center justify-center text-white font-black text-xl shadow-[0_0_25px_rgba(168,85,247,0.5)] group-hover:scale-115 group-hover:shadow-[0_0_35px_#A855F7] transition-all duration-300 animate-pulse">
+                            <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                        </div>
+                        <div class="bg-slate-900/90 border-2 border-spaceCyan rounded-2xl p-2.5 mt-3 w-full transition-all group-hover:scale-105 shadow-md">
+                            <span class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-rose-600 text-[6px] text-white font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-bounce">AI</span>
+                            <h4 class="text-[10px] font-black text-white uppercase">6. ✨ AI</h4>
+                            <p class="text-[8px] text-spaceCyan mt-0.5 font-black">Шексіз Тест</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Achievement Badges Card -->
+            <div class="premium-glass p-5 md:p-6 border-purple-500/30">
+                <h4 class="text-xs font-black text-spaceCyan uppercase tracking-widest mb-4 flex items-center gap-1.5 text-glow-cyan">
+                    <i class="fa-solid fa-award"></i> Академиялық Жетістіктер (Badges)
+                </h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <!-- Badge 1 -->
+                    <div id="badgePhonetic" class="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl flex items-center gap-3 opacity-40 grayscale transition-all duration-500">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                            <i class="fa-solid fa-microphone-lines text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-white leading-none">Фонетик</p>
+                            <p class="text-[8px] text-slate-400 mt-1">100 XP жинау</p>
+                        </div>
+                    </div>
+
+                    <!-- Badge 2 -->
+                    <div id="badgeStreak" class="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl flex items-center gap-3 opacity-40 grayscale transition-all duration-500">
+                        <div class="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-400">
+                            <i class="fa-solid fa-fire-flame-curved text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-white leading-none">Жалынды</p>
+                            <p class="text-[8px] text-slate-400 mt-1">Ойында 300 XP</p>
+                        </div>
+                    </div>
+
+                    <!-- Badge 3 -->
+                    <div id="badgeAssim" class="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl flex items-center gap-3 opacity-40 grayscale transition-all duration-500">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                            <i class="fa-solid fa-layer-group text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-white leading-none">Үйлесімді</p>
+                            <p class="text-[8px] text-slate-400 mt-1">3-Ойынды жеңу</p>
+                        </div>
+                    </div>
+
+                    <!-- Badge 4 -->
+                    <div id="badgeLegend" class="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl flex items-center gap-3 opacity-40 grayscale transition-all duration-500">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-crown text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-white leading-none">Аңыз</p>
+                            <p class="text-[8px] text-slate-400 mt-1">500 XP жинау</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Lab Analyzer Terminal -->
+            <div class="premium-glass p-6 border-cyan-400/50 relative overflow-hidden">
+                <div class="absolute -right-12 -bottom-12 text-cyan-500/5 text-9xl pointer-events-none"><i class="fa-solid fa-terminal"></i></div>
+                <h3 class="text-sm font-black text-spaceCyan mb-2 flex items-center gap-2 text-glow-cyan">
+                    <i class="fa-solid fa-wand-magic-sparkles text-harmonyMint animate-pulse"></i> ✨ AI Тілші-Талдағыш (Lab Terminal)
+                </h3>
+                <p class="text-slate-300 text-xs mb-4 leading-relaxed font-semibold">
+                    Кез келген қазақша сөзді немесе сөз тіркесін енгізіңіз. Gemini оның үндестік заңын, буын құрамын және дыбыстық ықпалдарын толықтай талдап береді!
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="aiSearchInput" placeholder="Мысалы: Оқушыларымыз, Көктемгі, Түнгі..." class="flex-1 bg-slate-950/80 border-2 border-cyan-500/40 focus:border-cyan-400 rounded-2xl px-4 py-3.5 text-sm text-slate-100 outline-none transition-all">
+                    <button onclick="analyzeWordWithAI()" class="bg-gradient-to-r from-spaceCyan via-spaceBlue to-harmonyViolet hover:from-cyan-400 hover:to-purple-500 px-6 py-3.5 rounded-2xl font-black text-sm text-white transition-all shadow-lg shadow-cyan-500/20 whitespace-nowrap flex items-center justify-center gap-2">
+                        <span id="aiAnalyzeBtnText">✨ Жүйелік талдау</span>
+                        <div id="aiAnalyzeSpinner" class="hidden animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    </button>
+                </div>
+
+                <!-- Analysis response container -->
+                <div id="aiAnalysisResult" class="hidden mt-4 bg-slate-950/95 rounded-2xl border border-cyan-500/30 p-5 text-xs text-slate-200 leading-relaxed max-h-[250px] overflow-y-auto"></div>
+            </div>
+        </div>
+
+
+        <!-- ============================================ -->
+        <!-- GAME CONTAINER (DYNAMICAL SCREEN) -->
+        <!-- ============================================ -->
+        <div id="gamePlayground" class="hidden premium-glass p-6 rounded-3xl border-cyan-400/50 my-4 relative shadow-2xl transition-all duration-500">
+            <!-- Back to Menu -->
+            <button onclick="backToMenu()" class="absolute top-4 left-4 text-xs font-black bg-slate-900 hover:bg-slate-800 text-cyan-300 px-4 py-2 rounded-xl border border-cyan-500/30 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Артқа қайту
+            </button>
+
+            <!-- Game Description -->
+            <div class="text-center mb-6 pt-8">
+                <h3 id="activeGameTitle" class="text-2xl md:text-3xl font-black text-white text-glow-cyan uppercase">Ойын Аты</h3>
+                <p id="activeGameDescription" class="text-slate-300 text-xs font-semibold mt-1">Ойын сипаттамасы</p>
+            </div>
+
+            <!-- Lives and Score panel -->
+            <div class="flex items-center justify-between mb-6 bg-slate-950/80 p-3.5 rounded-2xl border border-cyan-500/30">
+                <div class="text-xs text-slate-300 font-extrabold flex items-center gap-2">
+                    Жиналған ұпай: <span id="sessionScore" class="font-black text-spaceCyan text-base">0</span>
+                    <span id="comboBadge" class="hidden bg-gradient-to-r from-harmonyViolet to-pink-600 text-white font-extrabold px-2 py-0.5 rounded-md text-[10px] animate-pulse">COMBO x1</span>
+                </div>
+                <div id="gameTimerContainer" class="hidden flex items-center gap-2 text-xs text-slate-300 font-extrabold">
+                    <i class="fa-regular fa-clock text-spaceCyan animate-pulse"></i> Уақыт қалды: <span id="gameTimer" class="font-black text-spaceCyan text-sm">60</span>с
+                </div>
+                <div id="gameLivesContainer" class="hidden flex items-center gap-1.5">
+                    <span class="text-xs text-slate-300 mr-1 font-extrabold">Экипаж өмірі:</span>
+                    <div id="livesStars" class="flex gap-1 text-red-500">
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC GAME PLAYGROUND WRAPPER -->
+            <div id="gameScreenContent" class="min-h-[300px] flex flex-col justify-center items-center"></div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER / MOTIVATION -->
+    <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-900 mt-8">
+        <div>© 2026 Space Academy — Үндестік заңы. Бүкіл құқықтары қорғалған.</div>
+        <div class="text-spaceCyan font-bold mt-1">Жасанды Интеллект (Gemini 2.5 Flash) лабораториясы ⚡</div>
+    </footer>
+
+
+    <!-- ============================================ -->
+    <!-- MODALS & NOTIFICATIONS -->
+    <!-- ============================================ -->
+
+    <!-- Rules Modal (Help Panel) -->
+    <div id="rulesModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="premium-glass max-w-2xl w-full p-6 md:p-8 border-cyan-500/50 shadow-3xl relative max-h-[85vh] overflow-y-auto">
+            <button onclick="closeRulesModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl md:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-spaceCyan to-harmonyMint mb-5 flex items-center gap-2 text-glow-cyan">
+                <i class="fa-solid fa-graduation-cap"></i> Үндестік Заңы (Space Academy Guide)
+            </h3>
+            
+            <div class="space-y-4 text-sm text-slate-200 leading-relaxed font-medium">
+                <div class="bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/30 shadow-md">
+                    <h4 class="font-bold text-spaceCyan mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-play"></i> 1. Буын үндестігі (Сингармонизм)
+                    </h4>
+                    <p class="text-xs">Сөздің бірыңғай жуан не жіңішке буынды болуы. Қазақ сөздері не жуан, не жіңішке болып келеді. Мысалы: <span class="text-harmonyAmber font-bold">бала-лар (жуан)</span>, <span class="text-harmonyMint font-bold">мектеп-тер (жіңішке)</span>.</p>
+                </div>
+
+                <div class="bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/30 shadow-md">
+                    <h4 class="font-bold text-spaceCyan mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-spin"></i> 2. Дыбыс үндестігі (Ассимиляция)
+                    </h4>
+                    <p class="text-xs">Көрші дыбыстардың бір-біріне әсер етіп, өзара үйлесуі.</p>
+                    <ul class="list-disc pl-5 space-y-1.5 mt-2 text-xs">
+                        <li><span class="text-harmonyMint font-extrabold">Ілгерінді ықпал:</span> Алдыңғы дыбыстың соңғы дыбысқа әсері (мысалы: <i>мектеп-ке</i>).</li>
+                        <li><span class="text-harmonyAmber font-extrabold">Кейінді ықпал:</span> Соңғы дыбыстың алдыңғы дыбысқа әсері (мысалы: <i>тарағы</i>, қ-дан кейін дауысты ы келіп, қ дыбысы ғ-ға өзгереді).</li>
+                        <li><span class="text-harmonyViolet font-extrabold">Тоғыспалы ықпал:</span> Көрші дыбыстардың бір-біріне өзара әсер етіп, екеуінің де өзгеруі (мысалы: <i>сөзшең</i> -> айтылуы: <i>сөшшең</i>).</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button onclick="closeRulesModal()" class="w-full mt-6 bg-gradient-to-r from-spaceCyan via-spaceBlue to-harmonyViolet hover:from-cyan-400 hover:to-purple-500 text-white font-black py-3.5 px-4 rounded-2xl transition-all shadow-lg shadow-cyan-500/20">
+                Ғарыштық жолды жалғастыру
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Toast modal -->
+    <div id="toastMessage" class="hidden fixed bottom-6 right-6 z-50 premium-glass border border-cyan-500/40 px-6 py-4 shadow-3xl flex items-center gap-3 transition-all duration-300 transform translate-y-10">
+        <div id="toastIcon" class="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div>
+            <p id="toastTitle" class="font-black text-sm text-white">Жарайсың!</p>
+            <p id="toastBody" class="text-xs text-slate-200 font-semibold">Ұпай қосылды.</p>
+        </div>
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- MAIN ENGINE / APP CONTROLLER -->
+    <!-- ============================================ -->
+    <script>
+        // Sound engine (Web Audio API)
+        let isSoundEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBeep(freq, type, duration) {
+            if (!isSoundEnabled) return;
+            initAudio();
+            try {
+                let osc = audioCtx.createOscillator();
+                let gainNode = audioCtx.createGain();
+                
+                osc.type = type || 'sine';
+                osc.frequency.setValueAtTime(freq || 440, audioCtx.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        function playSuccessSound() {
+            playBeep(523.25, 'triangle', 0.15); // C5
+            setTimeout(() => playBeep(659.25, 'triangle', 0.2), 120); // E5
+        }
+
+        function playErrorSound() {
+            playBeep(180, 'sawtooth', 0.35); // Buzz
+        }
+
+        function playLevelUpSound() {
+            const notes = [261.63, 329.63, 392.00, 523.25]; // C4-E4-G4-C5
+            notes.forEach((freq, idx) => {
+                setTimeout(() => playBeep(freq, 'sine', 0.25), idx * 150);
+            });
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            const icon = document.getElementById('soundIcon');
+            if (isSoundEnabled) {
+                icon.className = "fa-solid fa-volume-high";
+                playSuccessSound();
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+            }
+        }
+
+        // Core states
+        let totalXP = 0;
+        let activeGameId = null;
+        let gameScore = 0;
+        let gameTimerInterval = null;
+        let timeLeft = 60;
+        let lives = 3;
+        let comboCount = 0;
+        let activeStreak = 3; // Daily Streak mocked/saved
+
+        // Canvas Particles setup
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 3;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * -8 - 2;
+                this.color = color;
+                this.gravity = 0.2;
+                this.alpha = 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += this.gravity;
+                this.alpha -= 0.02;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Trigger particles explosion on correct answer
+        function triggerSuccessParticles(x, y) {
+            const colors = ['#A855F7', '#22D3EE', '#4ADE80', '#ffffff'];
+            for (let i = 0; i < 40; i++) {
+                particles.push(new Particle(x || window.innerWidth / 2, y || window.innerHeight / 2 - 50, colors[Math.floor(Math.random() * colors.length)]));
+            }
+        }
+
+        // Trigger red/orange flash on error
+        function triggerErrorFlash() {
+            document.body.classList.add('error-flash');
+            setTimeout(() => {
+                document.body.classList.remove('error-flash');
+            }, 500);
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, idx) => {
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) {
+                    particles.splice(idx, 1);
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Data banks for Games
+        const vowelHarmonyWords = [
+            { word: "күнделік", type: "жіңішке", detail: "Үлгілі жіңішке буынды сөз" },
+            { word: "домбыра", type: "жуан", detail: "Тек жуан дауысты дыбыстардан құралған" },
+            { word: "терезе", type: "жіңішке", detail: "Барлық дауысты дыбыстары жіңішке: е-е-е" },
+            { word: "балалар", type: "жуан", detail: "Жуан буынды атақты қазақ сөзі" },
+            { word: "дөңгелек", type: "жіңішке", detail: "Ө-е-е жіңішке дауыстылар" },
+            { word: "кітапхана", type: "аралас", detail: "Аралас сөз, бірақ негізі үндестік заңынан тыс кірме сөз" },
+            { word: "qazaqstan", type: "жуан", detail: "Жуан дауыстылардан құралған" },
+            { word: "бәйшешек", type: "жіңішке", detail: "Көктемнің жіңішке гүлі" },
+            { word: "өрмекші", type: "жіңішке", detail: "Тек жіңішке буынды" },
+            { word: "табиғат", type: "аралас", detail: "Кірме сөз, аралас буынды" },
+            { word: "саяхатшы", type: "жуан", detail: "Жуан дыбыстар" },
+            { word: "тәрбиеші", text: "тәрбиеші", type: "жіңішке", detail: "Жіңішке үндесімді" }
+        ];
+
+        const suffixGameQuestions = [
+            { root: "мектеп", options: ["ке", "қа", "ге", "ға"], correct: "ке", text: "мектеп+..." },
+            { root: "бала", options: ["лар", "лер", "дар", "тер"], correct: "лар", text: "бала+..." },
+            { root: "кітап", options: ["ты", "ды", "ты", "ы"], correct: "ы", text: "кітап + дауысты (п->б ауысады)" },
+            { root: "орман", options: ["ға", "қа", "да", "на"], correct: "ға", text: "орман+..." },
+            { root: "дос", options: ["тар", "дар", "лар", "тер"], correct: "тар", text: "дос+..." },
+            { root: "түн", options: ["де", "те", "де", "дегі"], correct: "де", text: "түн+..." },
+            { root: "дәптер", options: ["ді", "ті", "ты", "лі"], correct: "ді", text: "дәптер+..." }
+        ];
+
+        const assimilationData = [
+            { word: "Достар", type: "ілгерінді", detail: "с(қатаң) әсерінен жалғау л-дан т-ға өзгереді." },
+            { word: "Күрекпен", type: "ілгерінді", detail: "к(қатаң) әсерінен жалғау б-дан п-ға өзгерді." },
+            { word: "Жанбады", type: "кейінді", detail: "кейінгі б(ұяң) әсерінен алдыңғы н үнді м-ге айналады (жамбады)." },
+            { word: "Түнгі", type: "кейінді", detail: "г(ұяң) әсерінен алдыңғы н үнді ң-ге айналады (түңгі)." },
+            { word: "Сөзшең", type: "тоғыспалы", detail: "з(ұяң) мен ш(қатаң) тоғысып, екеуі де өзгереді (сөшшең)." },
+            { word: "Ақ ешкі", type: "кейінді", detail: "дауысты е әсерінен алдыңғы қатаң қ дыбысы ұяң ғ-ға өзгереді (ағешкі)." },
+            { word: "Көзқарас", type: "ілгерінді", detail: "з(ұяң) әсерінен жалғау қатаң қ болып тұр." }
+        ];
+
+        const impostorData = [
+            { list: ["терезелер", "гүлдер", "балалер", "үйшіктер"], correct: "балалер", explanation: "Бала - жуан сөз, оған жіңішке 'лер' жалғанбауы тиіс (дұрысы: балалар)." },
+            { list: ["кітапке", "дәптерге", "күнделікке", "қаламға"], correct: "кітапке", explanation: "Кітап аралас болғанымен, соңғы буыны жіңішке емес немесе қатаң п-дан кейін қатаң қ келуі керек: кітапқа." },
+            { list: ["жазғы", "көктемгі", "қысгі", "күзгі"], correct: "қысгі", explanation: "Қыс сөзі қатаңнан аяқталады, сондықтан қатаң қ-мен жалғануы тиіс (дұрысы: qысқы)." }
+        ];
+
+        const harmonyCreatorData = [
+            { root: "Жұмыс", target: "жұмысшылар", clue: "Жұмыс істейтін адамдар тобы (көптік + мамандық)", correctParts: ["шы", "лар"] },
+            { root: "Сенім", target: "sensimdilikh", target: "сенімділік", clue: "Сенімге ие болу қасиеті (сын есім + дерексіз есім)", correctParts: ["ді", "лік"] },
+            { root: "Еңбек", target: "еңбекқорлық", clue: "Еңбекті сүйетін қасиет", correctParts: ["қор", "лық"] }
+        ];
+
+        // Global functions
+        window.onload = function() {
+            // Load saved stats
+            totalXP = parseInt(localStorage.getItem('undestik_xp')) || 0;
+            activeStreak = parseInt(localStorage.getItem('undestik_streak')) || 3;
+            updateXPDisplay();
+            checkBadges();
+            
+            // Welcome message
+            setTimeout(() => {
+                playLevelUpSound();
+                showToast("Дайынсың ба, Кадет? ⚡", "Миссия бағдарын таңдап, жұлдызды саяхатқа аттан!");
+            }, 600);
+        };
+
+        function updateXPDisplay() {
+            document.getElementById('xpCount').innerText = totalXP;
+            document.getElementById('streakVal').innerText = `🔥 ${activeStreak} Күн`;
+            localStorage.setItem('undestik_xp', totalXP);
+            localStorage.setItem('undestik_streak', activeStreak);
+
+            // Calculate level
+            let level = Math.floor(totalXP / 200) + 1;
+            let currentLevelXP = totalXP % 200;
+            let progressPercent = Math.floor((currentLevelXP / 200) * 100);
+
+            let rankName = "Кадет";
+            if (level >= 2) rankName = "Ұшқыш";
+            if (level >= 3) rankName = "Офицер";
+            if (level >= 4) rankName = "Командор";
+
+            document.getElementById('userLevel').innerText = `Ранг: ${level} (${rankName})`;
+            document.getElementById('levelProgress').innerText = `${progressPercent}%`;
+            document.getElementById('levelProgressBar').style.width = `${progressPercent}%`;
+
+            checkBadges();
+        }
+
+        function checkBadges() {
+            const bPhonetic = document.getElementById('badgePhonetic');
+            const bStreak = document.getElementById('badgeStreak');
+            const bAssim = document.getElementById('badgeAssim');
+            const bLegend = document.getElementById('badgeLegend');
+
+            if (totalXP >= 100) {
+                bPhonetic.classList.remove('opacity-40', 'grayscale');
+                bPhonetic.classList.add('border-purple-500/60', 'glow-violet');
+            }
+            if (totalXP >= 300) {
+                bStreak.classList.remove('opacity-40', 'grayscale');
+                bStreak.classList.add('border-pink-500/60', 'glow-amber');
+            }
+            if (localStorage.getItem('assimilation_beaten') === 'true') {
+                bAssim.classList.remove('opacity-40', 'grayscale');
+                bAssim.classList.add('border-cyan-500/60', 'glow-mint');
+            }
+            if (totalXP >= 500) {
+                bLegend.classList.remove('opacity-40', 'grayscale');
+                bLegend.classList.add('border-amber-500/60', 'glow-amber');
+            }
+        }
+
+        function showToast(title, body, isError = false) {
+            const toast = document.getElementById('toastMessage');
+            const tTitle = document.getElementById('toastTitle');
+            const tBody = document.getElementById('toastBody');
+            const tIcon = document.getElementById('toastIcon');
+
+            tTitle.innerText = title;
+            tBody.innerText = body;
+
+            if (isError) {
+                tIcon.className = "w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center";
+                tIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                toast.style.borderColor = "#F43F5E";
+                toast.style.boxShadow = "0 0 20px rgba(244,63,94,0.4)";
+            } else {
+                tIcon.className = "w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center";
+                tIcon.innerHTML = '<i class="fa-solid fa-shuttle-space"></i>';
+                toast.style.borderColor = "#22D3EE";
+                toast.style.boxShadow = "0 0 20px rgba(34,211,238,0.4)";
+            }
+
+            toast.classList.remove('hidden', 'translate-y-10');
+            toast.classList.add('flex', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-10');
+                setTimeout(() => {
+                    toast.classList.remove('flex');
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3200);
+        }
+
+        function showRulesModal() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        }
+
+        function closeRulesModal() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        }
+
+        function backToMenu() {
+            clearInterval(gameTimerInterval);
+            document.getElementById('gamePlayground').classList.add('hidden');
+            document.getElementById('gameMenu').classList.remove('hidden');
+            activeGameId = null;
+        }
+
+        // ============================================
+        // GEMINI API CALLER WITH RETRY & BACKOFF
+        // ============================================
+        async function callGeminiAPI(prompt, systemInstruction = "", isJson = false) {
+            const apiKey = ""; // runtime injected by preview environment
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            
+            if (systemInstruction) {
+                payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+            }
+            
+            if (isJson) {
+                payload.generationConfig = {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            question: { type: "STRING" },
+                            options: { 
+                                type: "ARRAY", 
+                                items: { type: "STRING" }
+                            },
+                            correct: { type: "STRING" },
+                            explanation: { type: "STRING" }
+                        },
+                        required: ["question", "options", "correct", "explanation"]
+                    }
+                };
+            }
+
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (text) {
+                        return isJson ? JSON.parse(text) : text;
+                    }
+                } catch (error) {
+                    if (i === 4) {
+                        throw error;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+            throw new Error("API call failed after retries.");
+        }
+
+        // ============================================
+        // FEATURE: AI WORD ANALYZER
+        // ============================================
+        async function analyzeWordWithAI() {
+            const wordInput = document.getElementById('aiSearchInput').value.trim();
+            const resultBox = document.getElementById('aiAnalysisResult');
+            const btnText = document.getElementById('aiAnalyzeBtnText');
+            const spinner = document.getElementById('aiAnalyzeSpinner');
+
+            if (!wordInput) {
+                showToast("Жүйелік талдау мүмкін емес!", "Алдымен зерттейтін сөзді енгізіңіз.", true);
+                return;
+            }
+
+            btnText.innerText = "✨ Зерттелуде...";
+            spinner.classList.remove('hidden');
+            resultBox.classList.remove('hidden');
+            resultBox.innerHTML = `
+                <div class="flex items-center gap-3 justify-center py-5">
+                    <div class="animate-spin rounded-full h-6 w-6 border-2 border-cyan-400 border-t-transparent"></div>
+                    <span class="text-cyan-300 font-extrabold text-xs">Gemini AI сөздің фонетикалық құрылымын сканерлеп жатыр...</span>
+                </div>
+            `;
+
+            const systemInstruction = "Сіз қазақ тілі мен фонетикасын жетік меңгерген білікті тілші, ақылды мұғалімсіз. Пайдаланушы берген қазақша сөзді үндестік заңы (буын үндестігі және дыбыс үндестігі) тұрғысынан өте түсінікті, заманауи және қызықты етіп талдап беріңіз. Жауапты қысқа әрі нұсқа (абзац немесе тізім түрінде) жазыңыз.";
+            const prompt = `Мына сөзге үндестік заңы бойынша толық грамматикалық талдау жасап бер: "${wordInput}"`;
+
+            try {
+                const responseText = await callGeminiAPI(prompt, systemInstruction, false);
+                const formattedText = responseText
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-cyan-350 font-black">$1</strong>');
+                
+                resultBox.innerHTML = `
+                    <div class="flex justify-between items-center pb-2 mb-3 border-b border-cyan-500/20 text-cyan-300">
+                        <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-satellite text-cyan-400 animate-pulse"></i> "${wordInput}" сөзін сканерлеу нәтижесі:</span>
+                        <button onclick="document.getElementById('aiAnalysisResult').classList.add('hidden')" class="hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="text-[12.5px] leading-relaxed select-text text-slate-100 font-medium">${formattedText}</div>
+                `;
+                playSuccessSound();
+                triggerSuccessParticles();
+            } catch (err) {
+                playErrorSound();
+                triggerErrorFlash();
+                resultBox.innerHTML = `<span class="text-rose-400 font-bold">Байланыс қателігі: Басқару терминалын тексеріп, қайта көріңіз.</span>`;
+            } finally {
+                btnText.innerText = "✨ Жүйелік талдау";
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // ============================================
+        // GAME ROUTER
+        // ============================================
+        function startGame(gameId) {
+            activeGameId = gameId;
+            gameScore = 0;
+            comboCount = 0;
+            document.getElementById('sessionScore').innerText = "0";
+            document.getElementById('comboBadge').classList.add('hidden');
+            
+            document.getElementById('gameMenu').classList.add('hidden');
+            document.getElementById('gamePlayground').classList.remove('hidden');
+            
+            const timerContainer = document.getElementById('gameTimerContainer');
+            const livesContainer = document.getElementById('gameLivesContainer');
+            
+            timerContainer.classList.add('hidden');
+            livesContainer.classList.add('hidden');
+            clearInterval(gameTimerInterval);
+
+            if (gameId === 1) {
+                setupGame1();
+            } else if (gameId === 2) {
+                setupGame2();
+            } else if (gameId === 3) {
+                setupGame3();
+            } else if (gameId === 4) {
+                setupGame4();
+            } else if (gameId === 5) {
+                setupGame5();
+            } else if (gameId === 6) {
+                setupGame6();
+            }
+        }
+
+        // ============================================
+        // GAME 1: ЖУАН-ЖІҢІШКЕ СВАЙП (Bright Question Card)
+        // ============================================
+        let game1Index = 0;
+        let game1Shuffled = [];
+
+        function setupGame1() {
+            document.getElementById('activeGameTitle').innerText = "Жуан-Жіңішке Свайп";
+            document.getElementById('activeGameDescription').innerText = "Сөздерді буын үндестігіне қарай дұрыс бағытқа бағыттаңыз.";
+            
+            const timerContainer = document.getElementById('gameTimerContainer');
+            timerContainer.classList.remove('hidden');
+            timeLeft = 35;
+            document.getElementById('gameTimer').innerText = timeLeft;
+            
+            gameTimerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('gameTimer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    endGameSession("Уақыт аяқталды!", gameScore);
+                }
+            }, 1000);
+
+            game1Shuffled = [...vowelHarmonyWords].sort(() => Math.random() - 0.5);
+            game1Index = 0;
+            
+            renderGame1Card();
+        }
+
+        function renderGame1Card() {
+            if (game1Index >= game1Shuffled.length) {
+                game1Shuffled = [...vowelHarmonyWords].sort(() => Math.random() - 0.5);
+                game1Index = 0;
+            }
+
+            const item = game1Shuffled[game1Index];
+            const screen = document.getElementById('gameScreenContent');
+            
+            screen.innerHTML = `
+                <div class="w-full max-w-sm flex flex-col items-center">
+                    <div id="swipeCard" class="w-full question-card-bright p-8 text-center relative transition-all duration-300">
+                        <div class="absolute top-2 right-3 text-white/30 text-5xl font-black">${game1Index + 1}</div>
+                        <p class="text-[10px] text-sky-100 uppercase tracking-widest font-black mb-2">Бұл қандай буынды сөз?</p>
+                        <h4 class="text-4xl font-extrabold tracking-wide py-6 select-none text-white">${item.word}</h4>
+                    </div>
+
+                    <div class="flex items-center gap-4 mt-8 w-full">
+                        <button onclick="handleSwipe('жіңішке', event)" class="flex-1 bg-gradient-to-r from-spaceBlue to-harmonyViolet hover:from-cyan-400 hover:to-purple-500 py-4 px-6 rounded-3xl font-black text-sm text-white shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Жіңішке
+                        </button>
+                        <button onclick="handleSwipe('жуан', event)" class="flex-1 bg-gradient-to-r from-pink-500 to-harmonyViolet hover:from-pink-400 hover:to-purple-500 py-4 px-6 rounded-3xl font-black text-sm text-white shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                            Жуан <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCombo(correct) {
+            const badge = document.getElementById('comboBadge');
+            if (correct) {
+                comboCount++;
+                if (comboCount >= 2) {
+                    badge.innerText = `COMBO x${comboCount}`;
+                    badge.classList.remove('hidden');
+                }
+            } else {
+                comboCount = 0;
+                badge.classList.add('hidden');
+            }
+        }
+
+        function handleSwipe(chosenType, event) {
+            const item = game1Shuffled[game1Index];
+            const card = document.getElementById('swipeCard');
+            
+            if (chosenType === 'жіңішке') {
+                card.classList.add('swipe-left');
+            } else {
+                card.classList.add('swipe-right');
+            }
+
+            setTimeout(() => {
+                if (item.type === chosenType || (item.type === 'аралас' && chosenType === 'аралас')) {
+                    playSuccessSound();
+                    const calculatedXP = 15 + (comboCount * 5);
+                    gameScore += calculatedXP;
+                    totalXP += calculatedXP;
+                    updateCombo(true);
+                    updateXPDisplay();
+                    document.getElementById('sessionScore').innerText = gameScore;
+                    showToast("Керемет! 🔥", `"${item.word}" - ${item.detail}`, false);
+                    triggerSuccessParticles(event.clientX, event.clientY);
+                } else {
+                    playErrorSound();
+                    updateCombo(false);
+                    triggerErrorFlash();
+                    showToast("Мүлт кеттіңіз!", `"${item.word}" сөзі негізінен ${item.type} буынды.`, true);
+                }
+
+                game1Index++;
+                renderGame1Card();
+            }, 300);
+        }
+
+        // ============================================
+        // GAME 2: ЖАЛҒАУЛАР ШАЙҚАСЫ
+        // ============================================
+        let game2Index = 0;
+        let game2Shuffled = [];
+
+        function setupGame2() {
+            document.getElementById('activeGameTitle').innerText = "Жалғаулар Шайқасы";
+            document.getElementById('activeGameDescription').innerText = "Түбірге үйлесетін дұрыс жалғауды тауып, неондық қалқанды белсендіріңіз.";
+            
+            const livesContainer = document.getElementById('gameLivesContainer');
+            livesContainer.classList.remove('hidden');
+            lives = 3;
+            updateLivesDisplay();
+
+            game2Shuffled = [...suffixGameQuestions].sort(() => Math.random() - 0.5);
+            game2Index = 0;
+
+            renderGame2Question();
+        }
+
+        function updateLivesDisplay() {
+            const stars = document.getElementById('livesStars');
+            stars.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) {
+                    stars.innerHTML += '<i class="fa-solid fa-heart text-rose-500 text-lg animate-pulse mx-0.5"></i>';
+                } else {
+                    stars.innerHTML += '<i class="fa-regular fa-heart text-slate-700 text-lg mx-0.5"></i>';
+                }
+            }
+        }
+
+        function renderGame2Question() {
+            if (game2Index >= game2Shuffled.length) {
+                endGameSession("Абсолютті Жеңіс! Қалқандар орнатылды.", gameScore);
+                return;
+            }
+
+            const item = game2Shuffled[game2Index];
+            const screen = document.getElementById('gameScreenContent');
+
+            screen.innerHTML = `
+                <div class="w-full max-w-md text-center">
+                    <p class="text-[10px] text-spaceCyan font-black tracking-widest uppercase mb-2">Гармоникалық байланыс құру</p>
+                    <div class="question-card-bright p-8 mb-6 shadow-2xl">
+                        <div class="text-4xl font-black text-white flex items-center justify-center gap-1.5">
+                            <span>${item.root}</span>
+                            <span class="text-white bg-slate-950/40 px-4 py-1 rounded-2xl border-2 border-white/60">+ ?</span>
+                        </div>
+                        <p class="text-sky-100 text-xs mt-3 font-semibold">${item.text}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        ${item.options.map((opt, idx) => `
+                            <button onclick="checkGame2Answer('${opt}', event)" class="bg-slate-900 hover:bg-slate-800 border-2 border-cyan-400/40 hover:border-cyan-400 py-4 px-6 rounded-3xl font-black text-xl text-white transition-all hover:scale-[1.03] shadow-md hover:shadow-cyan-500/10">
+                                +${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkGame2Answer(selectedOption, event) {
+            const item = game2Shuffled[game2Index];
+
+            if (selectedOption === item.correct) {
+                playSuccessSound();
+                const calculatedXP = 20 + (comboCount * 5);
+                gameScore += calculatedXP;
+                totalXP += calculatedXP;
+                updateCombo(true);
+                updateXPDisplay();
+                document.getElementById('sessionScore').innerText = gameScore;
+                showToast("Дұрыс!", `Жалғанды: ${item.root}+${item.correct}`, false);
+                triggerSuccessParticles(event.clientX, event.clientY);
+            } else {
+                playErrorSound();
+                updateCombo(false);
+                triggerErrorFlash();
+                lives--;
+                updateLivesDisplay();
+                showToast("Зақым тиді!", `Үйлесім бұзылды. Дұрысы: +${item.correct}`, true);
+                
+                if (lives <= 0) {
+                    endGameSession("Матч аяқталды! Үйлесім бұзылды.", gameScore);
+                    return;
+                }
+            }
+
+            game2Index++;
+            setTimeout(renderGame2Question, 600);
+        }
+
+        // ============================================
+        // GAME 3: ЫҚПАЛДАР СӘЙКЕСТІГІ (SPECIFIED PORTALS GLOW)
+        // ============================================
+        let game3Index = 0;
+        let game3Shuffled = [];
+
+        function setupGame3() {
+            document.getElementById('activeGameTitle').innerText = "Ықпалдар Сәйкестігі (Space Portals)";
+            document.getElementById('activeGameDescription').innerText = "Сөздегі дыбыстардың ықпал түрін тауып, тиісті энергетикалық порталға бағыттаңыз.";
+
+            game3Shuffled = [...assimilationData].sort(() => Math.random() - 0.5);
+            game3Index = 0;
+
+            renderGame3Question();
+        }
+
+        function renderGame3Question() {
+            if (game3Index >= game3Shuffled.length) {
+                localStorage.setItem('assimilation_beaten', 'true');
+                checkBadges();
+                endGameSession("Таңғажайып! Бүкіл энергетикалық ықпалдар сәйкестендірілді.", gameScore);
+                return;
+            }
+
+            const item = game3Shuffled[game3Index];
+            const screen = document.getElementById('gameScreenContent');
+
+            screen.innerHTML = `
+                <div class="w-full max-w-3xl text-center flex flex-col items-center">
+                    
+                    <div class="mb-4">
+                        <span class="bg-cyan-950/80 text-spaceCyan text-xs px-3.5 py-1.5 rounded-full font-black uppercase tracking-widest border border-cyan-500/30">
+                            Экспедиция бағыты: ${game3Index + 1}/${game3Shuffled.length}
+                        </span>
+                    </div>
+                    
+                    <!-- Brighter Question Word Area inside Gradient Card -->
+                    <div class="question-card-bright p-8 rounded-3xl mb-8 shadow-2xl relative w-full max-w-md transform transition-all duration-500 hover:scale-105">
+                        <p class="text-[10px] text-sky-100 uppercase tracking-widest mb-1 font-bold">Фонетикалық өзгеріс сигналы:</p>
+                        <h4 class="text-4xl font-black text-white tracking-wider animate-pulse">${item.word}</h4>
+                    </div>
+
+                    <!-- REDESIGNED BRIGHT PORTALS GRID -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full px-4">
+                        
+                        <!-- PORTAL 1: ІЛГЕРІНДІ ЫҚПАЛ (Bright Mint Green - #4ADE80) -->
+                        <div onclick="selectGame3Portal('ілгерінді', event)" class="premium-glass bg-slate-900/90 glow-mint p-6 rounded-3xl cursor-pointer flex flex-col items-center shadow-lg transition-all duration-300 transform hover:-translate-y-2 group">
+                            <!-- Glowing Emerald Portal Vortex -->
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-green-500/20 to-harmonyMint/40 border-2 border-harmonyMint flex items-center justify-center relative overflow-hidden mb-3">
+                                <div class="absolute inset-1 rounded-full border-2 border-dashed border-harmonyMint/60 vortex-animate"></div>
+                                <i class="fa-solid fa-chevron-right text-harmonyMint text-xl group-hover:scale-125 transition-transform"></i>
+                            </div>
+                            <span class="text-sm font-black text-harmonyMint uppercase tracking-wider block">Ілгерінді ықпал</span>
+                            <span class="text-[10px] text-slate-350 mt-1 block leading-relaxed font-semibold">Алдыңғы дыбыстың кейінгіге әсері</span>
+                        </div>
+
+                        <!-- PORTAL 2: КЕЙІНДІ ЫҚПАЛ (Bright Amber Yellow - #FBBF24) -->
+                        <div onclick="selectGame3Portal('кейінді', event)" class="premium-glass bg-slate-900/90 glow-amber p-6 rounded-3xl cursor-pointer flex flex-col items-center shadow-lg transition-all duration-300 transform hover:-translate-y-2 group">
+                            <!-- Glowing Amber Portal Vortex -->
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500/20 to-harmonyAmber/40 border-2 border-harmonyAmber flex items-center justify-center relative overflow-hidden mb-3">
+                                <div class="absolute inset-1 rounded-full border-2 border-dashed border-harmonyAmber/60 vortex-animate" style="animation-duration: 4s;"></div>
+                                <i class="fa-solid fa-chevron-left text-harmonyAmber text-xl group-hover:scale-125 transition-transform"></i>
+                            </div>
+                            <span class="text-sm font-black text-harmonyAmber uppercase tracking-wider block">Кейінді ықпал</span>
+                            <span class="text-[10px] text-slate-350 mt-1 block leading-relaxed font-semibold">Кейінгі дыбыстың алдыңғыға әсері</span>
+                        </div>
+
+                        <!-- PORTAL 3: ТОҒЫСПАЛЫ ЫҚПАЛ (Bright Violet - #A855F7) -->
+                        <div onclick="selectGame3Portal('тоғыспалы', event)" class="premium-glass bg-slate-900/90 glow-violet p-6 rounded-3xl cursor-pointer flex flex-col items-center shadow-lg transition-all duration-300 transform hover:-translate-y-2 group">
+                            <!-- Glowing Violet Portal Vortex -->
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-500/20 to-harmonyViolet/40 border-2 border-harmonyViolet flex items-center justify-center relative overflow-hidden mb-3">
+                                <div class="absolute inset-1 rounded-full border-2 border-dashed border-harmonyViolet/60 vortex-animate" style="animation-duration: 8s;"></div>
+                                <i class="fa-solid fa-arrows-up-down text-harmonyViolet text-xl group-hover:scale-125 transition-transform"></i>
+                            </div>
+                            <span class="text-sm font-black text-harmonyViolet uppercase tracking-wider block">Тоғыспалы ықпал</span>
+                            <span class="text-[10px] text-slate-350 mt-1 block leading-relaxed font-semibold">Дыбыстардың өзара тоғысуы</span>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectGame3Portal(selectedType, event) {
+            const item = game3Shuffled[game3Index];
+
+            if (selectedType === item.type) {
+                playSuccessSound();
+                const calculatedXP = 25 + (comboCount * 5);
+                gameScore += calculatedXP;
+                totalXP += calculatedXP;
+                updateCombo(true);
+                updateXPDisplay();
+                document.getElementById('sessionScore').innerText = gameScore;
+                showToast("Портал сәйкестендірілді!", item.detail, false);
+                triggerSuccessParticles(event.clientX, event.clientY);
+            } else {
+                playErrorSound();
+                updateCombo(false);
+                triggerErrorFlash();
+                showToast("Байланыс сәтсіз!", `Дұрысы: бұл ${item.type} ықпал. ${item.detail}`, true);
+            }
+
+            game3Index++;
+            setTimeout(renderGame3Question, 1200);
+        }
+
+        // ============================================
+        // GAME 4: ҚАТЕСІН ТАП (ИМПОСТОР)
+        // ============================================
+        let game4Index = 0;
+        let game4Shuffled = [];
+
+        function setupGame4() {
+            document.getElementById('activeGameTitle').innerText = "Импосторды тап!";
+            document.getElementById('activeGameDescription').innerText = "Фонетикалық қатесі бар, үндестік заңы бұзылған қатарды табыңыз.";
+
+            game4Shuffled = [...impostorData].sort(() => Math.random() - 0.5);
+            game4Index = 0;
+
+            renderGame4Question();
+        }
+
+        function renderGame4Question() {
+            if (game4Index >= game4Shuffled.length) {
+                endGameSession("Зейін сынағы аяқталды. Барлығы тазартылды!", gameScore);
+                return;
+            }
+
+            const item = game4Shuffled[game4Index];
+            const screen = document.getElementById('gameScreenContent');
+
+            screen.innerHTML = `
+                <div class="w-full max-w-md text-center">
+                    <p class="text-[10px] text-pink-400 font-black tracking-wider mb-4 uppercase">Желідегі қауіпті қате сөзді жойыңыз</p>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        ${item.list.map((word) => `
+                            <button onclick="checkGame4Answer('${word}', event)" class="bg-slate-900 hover:bg-slate-800 border-2 border-cyan-500/30 hover:border-cyan-400 p-4 rounded-3xl font-bold text-white flex items-center justify-between transition-all px-6 shadow-md">
+                                <span class="text-lg font-black tracking-wide">${word}</span>
+                                <span class="text-xs text-spaceCyan font-extrabold"><i class="fa-solid fa-satellite-dish"></i> Сканерлеу</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkGame4Answer(selectedWord, event) {
+            const item = game4Shuffled[game4Index];
+
+            if (selectedWord === item.correct) {
+                playSuccessSound();
+                const calculatedXP = 30 + (comboCount * 5);
+                gameScore += calculatedXP;
+                totalXP += calculatedXP;
+                updateCombo(true);
+                updateXPDisplay();
+                document.getElementById('sessionScore').innerText = gameScore;
+                showToast("Импостор жойылды!", item.explanation, false);
+                triggerSuccessParticles(event.clientX, event.clientY);
+            } else {
+                playErrorSound();
+                updateCombo(false);
+                triggerErrorFlash();
+                showToast("Қателік!", `Бұл сөзде үндестік заңдылығы толық сақталған.`, true);
+            }
+
+            game4Index++;
+            setTimeout(renderGame4Question, 1200);
+        }
+
+        // ============================================
+        // GAME 5: ГАРМОНИЯ КОНСТРУКТОРЫ
+        // ============================================
+        let game5Index = 0;
+        let game5Shuffled = [];
+        let selectedParts = [];
+
+        function setupGame5() {
+            document.getElementById('activeGameTitle').innerText = "Гармония Конструкторы";
+            document.getElementById('activeGameDescription').innerText = "Жалғау бөлшектерін дұрыс ретпен біріктіріп, қажетті сөздің формуласын құрастырыңыз.";
+
+            game5Shuffled = [...harmonyCreatorData].sort(() => Math.random() - 0.5);
+            game5Index = 0;
+
+            renderGame5Question();
+        }
+
+        function renderGame5Question() {
+            if (game5Index >= game5Shuffled.length) {
+                endGameSession("Ғаламат! Барлық сөздер сәтті құрастырылды.", gameScore);
+                return;
+            }
+
+            selectedParts = [];
+            const item = game5Shuffled[game5Index];
+            const screen = document.getElementById('gameScreenContent');
+
+            const distractors = ["лар", "лер", "шы", "ші", "лық", "лік", "қа", "ке", "қор"];
+            let pool = [...item.correctParts];
+            while (pool.length < 6) {
+                const randomPart = distractors[Math.floor(Math.random() * distractors.length)];
+                if (!pool.includes(randomPart)) {
+                    pool.push(randomPart);
+                }
+            }
+            pool.sort(() => Math.random() - 0.5);
+
+            screen.innerHTML = `
+                <div class="w-full max-w-lg text-center">
+                    <p class="text-[10px] text-spaceCyan font-black uppercase tracking-wider mb-2">Морфологиялық зертханалық құрылым</p>
+                    
+                    <div class="question-card-bright p-6 rounded-3xl mb-6 shadow-2xl">
+                        <div class="text-xs text-sky-100 font-bold mb-1">Мәні: ${item.clue}</div>
+                        <div class="text-sm font-black text-white mb-4">Нысана сөз: "${item.target}"</div>
+                        
+                        <div class="inline-flex items-center gap-1.5 bg-slate-950 p-4 rounded-2xl border-2 border-white text-2xl font-black text-white">
+                            <span class="text-harmonyMint">${item.root}</span>
+                            <span id="constructorOutput" class="text-spaceCyan"></span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 mb-6" id="poolContainer">
+                        ${pool.map(part => `
+                            <button onclick="addPartToWord('${part}', this)" class="bg-slate-900 hover:bg-slate-800 border-2 border-cyan-500/30 hover:border-cyan-400 py-3.5 px-2 rounded-2xl font-black text-white transition-colors">
+                                +${part}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <button onclick="clearConstructor()" class="flex-1 bg-slate-900 hover:bg-slate-800 border border-red-500/40 text-red-400 text-xs py-3 rounded-2xl font-black transition-all">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Тазалау
+                        </button>
+                        <button onclick="verifyConstructorWord(event)" class="flex-2 bg-gradient-to-r from-spaceCyan via-spaceBlue to-harmonyViolet text-white font-black py-3 px-6 rounded-2xl text-xs shadow-lg">
+                            Формуланы тексеру <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addPartToWord(part, btnElement) {
+            selectedParts.push(part);
+            document.getElementById('constructorOutput').innerText = selectedParts.map(p => " + " + p).join('');
+            btnElement.classList.add('opacity-40', 'pointer-events-none');
+            playBeep(330, 'sine', 0.1);
+        }
+
+        function clearConstructor() {
+            selectedParts = [];
+            document.getElementById('constructorOutput').innerText = '';
+            renderGame5Question();
+        }
+
+        function verifyConstructorWord(event) {
+            const item = game5Shuffled[game5Index];
+            const builtWord = item.root.toLowerCase() + selectedParts.join('');
+            
+            if (builtWord === item.target.toLowerCase()) {
+                playSuccessSound();
+                const calculatedXP = 40 + (comboCount * 5);
+                gameScore += calculatedXP;
+                totalXP += calculatedXP;
+                updateCombo(true);
+                updateXPDisplay();
+                document.getElementById('sessionScore').innerText = gameScore;
+                showToast("Дұрыс құрастырылды!", `Сіз сөзді толықтай дұрыс құрдыңыз: "${item.target}"`, false);
+                triggerSuccessParticles(event.clientX, event.clientY);
+                
+                game5Index++;
+                setTimeout(renderGame5Question, 1500);
+            } else {
+                playErrorSound();
+                updateCombo(false);
+                triggerErrorFlash();
+                showToast("Сәйкестік бұзылды!", `Сіз құрастырған сөз: ${builtWord}. Қайталап көріңіз.`, true);
+                clearConstructor();
+            }
+        }
+
+        // ============================================
+        // GAME 6: ✨ AI ШЕКСІЗ ТАПСЫРМАЛАР (GEMINI API)
+        // ============================================
+        let activeAiQuestion = null;
+
+        function setupGame6() {
+            document.getElementById('activeGameTitle').innerText = "✨ AI Шексіз Тапсырмалар";
+            document.getElementById('activeGameDescription').innerText = "Gemini нақты уақытта жаңа тест сұрақтарын әзірлейді. Біліміңді шексіз сынап көр!";
+            generateAiQuestion();
+        }
+
+        async function generateAiQuestion() {
+            const screen = document.getElementById('gameScreenContent');
+            screen.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="relative inline-block mb-4">
+                        <div class="animate-spin rounded-full h-12 w-12 border-4 border-cyan-400 border-t-transparent"></div>
+                        <i class="fa-solid fa-sparkles text-cyan-300 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse text-lg"></i>
+                    </div>
+                    <p class="text-cyan-300 font-black text-sm">Gemini жаңа үндестік заңы сұрағын ойлап табуда... ✨</p>
+                    <p class="text-slate-305 text-xs mt-2 max-w-xs mx-auto font-semibold">Бұл сәл уақыт алуы мүмкін, бірақ сізге ең қызықты әрі сапалы тапсырма таңдалады.</p>
+                </div>
+            `;
+
+            const systemInstruction = "Сіз қазақ тілі фонетикасы бойынша тест тапсырмаларын дайындайтын ақылды жүйесіз. " +
+                "Пайдаланушыға 'Үндестік заңы' (сингармонизм, буын үндестігі немесе дыбыс үндестігі) тақырыбы бойынша қызықты 1 тест сұрағын JSON форматында жасап беріңіз. " +
+                "Нұсқалар саны әрқашан 4 болуы тиіс. Сұрақ тек қазақ тілінде болуы керек. Бір нұсқа міндетті түрде дұрыс болуы тиіс.";
+
+            const prompt = "Қазақ тіліндегі үндестік заңы, дыбыс ықпалдары (ілгерінді, кейінді, тоғыспалы ықпал) немесе жалғаулардың сәйкес келуі тақырыбында өте ерекше әрі танымдық 1 тест сұрағын нұсқаларымен қоса дайындаңыз.";
+
+            try {
+                const quiz = await callGeminiAPI(prompt, systemInstruction, true);
+                activeAiQuestion = quiz;
+                renderAiQuestion(quiz);
+            } catch (err) {
+                playErrorSound();
+                screen.innerHTML = `
+                    <div class="text-center py-6">
+                        <i class="fa-solid fa-circle-exclamation text-red-400 text-4xl mb-3"></i>
+                        <h4 class="text-lg font-bold text-white">Тапсырма жүктелмеді</h4>
+                        <p class="text-slate-305 text-xs mt-1 mb-4">Байланысты тексеріп, әрекетті қайталаңыз.</p>
+                        <button onclick="generateAiQuestion()" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-5 rounded-xl text-xs transition-all">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Қайта байқау
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAiQuestion(quiz) {
+            const screen = document.getElementById('gameScreenContent');
+            
+            screen.innerHTML = `
+                <div class="w-full max-w-lg">
+                    <div class="flex items-center gap-2 mb-4 text-xs text-spaceCyan bg-cyan-950/80 px-3.5 py-1.5 rounded-xl border border-cyan-500/30 w-fit">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span class="font-bold">AI ID-Сұрақ</span>
+                    </div>
+
+                    <div class="question-card-bright p-6 mb-6 shadow-xl">
+                        <h4 class="text-lg font-black leading-relaxed text-left">${quiz.question}</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-3 mb-6" id="aiOptionsContainer">
+                        ${quiz.options.map((opt, idx) => `
+                            <button onclick="checkAiAnswer('${opt}', this)" class="w-full bg-slate-900 hover:bg-slate-800 border-2 border-cyan-500/20 hover:border-cyan-400 p-4 rounded-3xl text-left font-bold text-white transition-all flex items-center justify-between px-5">
+                                <span class="text-sm select-none">${opt}</span>
+                                <i class="fa-regular fa-circle text-slate-550 transition-colors"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <p class="text-center text-[10px] text-slate-400 italic">Жауап бергеннен кейін түсіндірмесі көрсетіледі.</p>
+                </div>
+            `;
+        }
+
+        function checkAiAnswer(selectedOpt, btnElement) {
+            const container = document.getElementById('aiOptionsContainer');
+            const buttons = container.getElementsByTagName('button');
+            const correctOpt = activeAiQuestion.correct;
+
+            for (let btn of buttons) {
+                btn.disabled = true;
+                const text = btn.innerText.trim();
+                
+                if (text === correctOpt) {
+                    btn.className = "w-full bg-emerald-950/60 border-2 border-emerald-500 p-4 rounded-3xl text-left font-bold text-emerald-300 transition-all flex items-center justify-between px-5";
+                    btn.innerHTML = `<span class="text-sm">${text}</span><i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+                } else if (text === selectedOpt) {
+                    btn.className = "w-full bg-red-950/60 border-2 border-red-500 p-4 rounded-3xl text-left font-bold text-red-300 transition-all flex items-center justify-between px-5";
+                    btn.innerHTML = `<span class="text-sm">${text}</span><i class="fa-solid fa-circle-xmark text-red-400"></i>`;
+                } else {
+                    btn.className = "w-full bg-slate-950/40 border-2 border-slate-900 p-4 rounded-3xl text-left text-slate-500 opacity-40 transition-all flex items-center justify-between px-5";
+                }
+            }
+
+            const screen = document.getElementById('gameScreenContent');
+
+            if (selectedOpt === correctOpt) {
+                playSuccessSound();
+                gameScore += 50;
+                totalXP += 50;
+                updateXPDisplay();
+                document.getElementById('sessionScore').innerText = gameScore;
+                showToast("Дұрыс жауап! ✨", "+50 XP қосылды.", false);
+                triggerSuccessParticles();
+            } else {
+                playErrorSound();
+                triggerErrorFlash();
+                showToast("Дұрыс емес!", "Түсіндірмесін төменнен қараңыз.", true);
+            }
+
+            // Append explanation and Next button
+            const explanationBlock = document.createElement('div');
+            explanationBlock.className = "mt-6 bg-slate-900/90 border border-slate-800 p-5 rounded-3xl text-xs text-slate-250 leading-relaxed text-left animate-fadeIn";
+            explanationBlock.innerHTML = `
+                <div class="font-bold text-spaceCyan mb-1"><i class="fa-solid fa-circle-info"></i> Түсіндірме (AI Сабағы):</div>
+                <p class="italic text-slate-300 mb-4 font-semibold">${activeAiQuestion.explanation}</p>
+                
+                <button onclick="generateAiQuestion()" class="w-full bg-gradient-to-r from-spaceCyan via-spaceBlue to-harmonyViolet text-white font-black py-3.5 px-4 rounded-2xl text-xs shadow-lg transition-transform hover:scale-105 flex items-center justify-center gap-2">
+                    <span>Келесі ✨ AI Тапсырма</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            `;
+            screen.appendChild(explanationBlock);
+        }
+
+        // ============================================
+        // GAME SESSION OVER
+        // ============================================
+        function endGameSession(reason, finalScore) {
+            clearInterval(gameTimerInterval);
+            playLevelUpSound();
+
+            const screen = document.getElementById('gameScreenContent');
+            screen.innerHTML = `
+                <div class="text-center py-6 w-full max-w-sm">
+                    <div class="w-16 h-16 bg-cyan-500/10 text-spaceCyan rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    
+                    <h4 class="text-2xl font-black text-white mb-2 uppercase text-glow-cyan">Керемет Нәтиже!</h4>
+                    <p class="text-slate-305 text-xs px-4 mb-6 font-semibold">${reason}</p>
+
+                    <div class="bg-slate-900/95 border-2 border-cyan-400/30 p-4 rounded-3xl mb-6 shadow-xl">
+                        <span class="text-slate-400 text-[10px] block uppercase tracking-wider font-bold">Осы сессияда жиналған ұпай</span>
+                        <span class="text-3xl font-black text-spaceCyan">+${finalScore} XP</span>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <button onclick="startGame(${activeGameId})" class="w-full bg-gradient-to-r from-spaceCyan via-spaceBlue to-harmonyViolet text-white font-black py-3.5 px-4 rounded-2xl text-sm transition-all shadow-lg hover:scale-105">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Қайтадан ойнау
+                        </button>
+                        <button onclick="backToMenu()" class="w-full bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold py-3.5 px-4 rounded-2xl text-sm transition-all border border-slate-800">
+                            Басты мәзірге оралу
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

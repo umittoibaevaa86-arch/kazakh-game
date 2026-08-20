@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Дыбыс пойызы</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Trebuchet MS', sans-serif;
+    }
+
+    body{
+        min-height:100vh;
+        overflow:hidden;
+        background:
+        linear-gradient(rgba(255,120,120,0.85), rgba(255,120,120,0.85)),
+        url('https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1600&auto=format&fit=crop');
+        background-size:cover;
+        background-position:center;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .container{
+        width:95%;
+        max-width:1300px;
+        text-align:center;
+    }
+
+    h1{
+        color:white;
+        font-size:60px;
+        margin-bottom:20px;
+        text-shadow:
+        0 0 10px #fff,
+        0 0 20px #ff00ff,
+        0 0 40px #ff00ff;
+        animation: glow 2s infinite alternate;
+    }
+
+    @keyframes glow{
+        from{
+            text-shadow:
+            0 0 10px #fff,
+            0 0 20px #ff00ff,
+            0 0 40px #ff00ff;
+        }
+        to{
+            text-shadow:
+            0 0 20px #fff,
+            0 0 40px #00ffff,
+            0 0 60px #00ffff;
+        }
+    }
+
+    .score{
+        font-size:32px;
+        color:#fff;
+        margin-bottom:25px;
+        text-shadow:0 0 10px #000;
+    }
+
+    .letters{
+        display:flex;
+        justify-content:center;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:40px;
+    }
+
+    .letter{
+        width:80px;
+        height:80px;
+        background:rgba(255,255,255,0.2);
+        backdrop-filter:blur(8px);
+        border:3px solid white;
+        border-radius:20px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-size:40px;
+        font-weight:bold;
+        color:white;
+        cursor:grab;
+        box-shadow:
+        0 0 10px #fff,
+        0 0 20px #00ffff;
+        transition:0.3s;
+    }
+
+    .letter:hover{
+        transform:scale(1.1);
+    }
+
+    .trains{
+        display:flex;
+        justify-content:center;
+        gap:40px;
+        flex-wrap:wrap;
+    }
+
+    .wagon{
+        width:350px;
+        height:220px;
+        border-radius:30px;
+        border:4px solid white;
+        padding:20px;
+        position:relative;
+        transition:0.3s;
+        overflow:hidden;
+    }
+
+    .wagon h2{
+        color:white;
+        margin-bottom:15px;
+        text-shadow:0 0 10px black;
+    }
+
+    .vowel{
+        background:rgba(0,255,255,0.25);
+        box-shadow:
+        0 0 20px cyan,
+        0 0 40px cyan;
+    }
+
+    .consonant{
+        background:rgba(255,0,255,0.25);
+        box-shadow:
+        0 0 20px magenta,
+        0 0 40px magenta;
+    }
+
+    .dropzone{
+        width:100%;
+        height:130px;
+        border:3px dashed white;
+        border-radius:20px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        padding:10px;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .mini-letter{
+        width:50px;
+        height:50px;
+        background:white;
+        color:black;
+        border-radius:12px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        font-size:28px;
+        font-weight:bold;
+        animation: pop 0.3s;
+    }
+
+    @keyframes pop{
+        from{
+            transform:scale(0);
+        }
+        to{
+            transform:scale(1);
+        }
+    }
+
+    .shake{
+        animation:shake 0.4s;
+    }
+
+    @keyframes shake{
+        0%{transform:translateX(0);}
+        25%{transform:translateX(-10px);}
+        50%{transform:translateX(10px);}
+        75%{transform:translateX(-10px);}
+        100%{transform:translateX(0);}
+    }
+
+    .move{
+        animation:moveTrain 0.5s;
+    }
+
+    @keyframes moveTrain{
+        0%{transform:translateX(0);}
+        50%{transform:translateX(20px);}
+        100%{transform:translateX(0);}
+    }
+
+    .author{
+        margin-top:35px;
+        color:white;
+        font-size:24px;
+        text-shadow:0 0 10px black;
+    }
+
+</style>
+</head>
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дыбыс пойызы</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:
+    linear-gradient(rgba(255,120,120,0.85), rgba(255,120,120,0.85)),
+    url('https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=1600&auto=format&fit=crop');
+
+    background-size:cover;
+    background-position:center;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:95%;
+    text-align:center;
+}
+
+h1{
+    font-size:70px;
+    color:white;
+    margin-bottom:20px;
+
+    text-shadow:
+    0 0 10px white,
+    0 0 20px #ff00ff,
+    0 0 40px #00ffff;
+
+    animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+    from{
+        text-shadow:
+        0 0 10px white,
+        0 0 20px #ff00ff;
+    }
+
+    to{
+        text-shadow:
+        0 0 20px white,
+        0 0 40px #00ffff;
+    }
+}
+
+.score{
+    font-size:35px;
+    color:white;
+    margin-bottom:30px;
+    text-shadow:0 0 10px black;
+}
+
+.letters{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:40px;
+}
+
+.letter{
+    width:90px;
+    height:90px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.2);
+    backdrop-filter:blur(8px);
+
+    border:3px solid white;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:42px;
+    font-weight:bold;
+    color:white;
+
+    cursor:grab;
+
+    box-shadow:
+    0 0 10px white,
+    0 0 20px cyan;
+
+    transition:0.3s;
+}
+
+.letter:hover{
+    transform:scale(1.1);
+}
+
+.trains{
+    display:flex;
+    justify-content:center;
+    gap:50px;
+    flex-wrap:wrap;
+}
+
+.train{
+    width:520px;
+}
+
+.engine{
+    width:180px;
+    height:120px;
+    background:#333;
+    border-radius:20px 20px 0 0;
+    margin:auto;
+    position:relative;
+
+    box-shadow:
+    0 0 20px white,
+    0 0 30px cyan;
+}
+
+.engine::before{
+    content:"";
+    position:absolute;
+    width:60px;
+    height:60px;
+    background:#666;
+    top:-40px;
+    left:60px;
+    border-radius:10px;
+}
+
+.wagon{
+    width:100%;
+    height:260px;
+
+    border-radius:35px;
+    margin-top:10px;
+
+    border:5px solid white;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+
+    padding:20px;
+
+    transition:0.3s;
+}
+
+.vowel{
+    background:rgba(0,255,255,0.25);
+
+    box-shadow:
+    0 0 20px cyan,
+    0 0 40px cyan;
+}
+
+.consonant{
+    background:rgba(255,0,255,0.25);
+
+    box-shadow:
+    0 0 20px magenta,
+    0 0 40px magenta;
+}
+
+.wagon h2{
+    color:white;
+    font-size:36px;
+    margin-bottom:20px;
+
+    text-shadow:
+    0 0 10px black,
+    0 0 20px white;
+}
+
+.dropzone{
+    width:100%;
+    height:160px;
+
+    border:4px dashed white;
+    border-radius:20px;
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+
+    padding:10px;
+}
+
+.smallLetter{
+    width:55px;
+    height:55px;
+
+    background:white;
+    color:black;
+
+    border-radius:15px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:30px;
+    font-weight:bold;
+
+    animation:pop .3s;
+}
+
+@keyframes pop{
+    from{
+        transform:scale(0);
+    }
+
+    to{
+        transform:scale(1);
+    }
+}
+
+.move{
+    animation:moveTrain .5s;
+}
+
+@keyframes moveTrain{
+    0%{transform:translateX(0);}
+    50%{transform:translateX(25px);}
+    100%{transform:translateX(0);}
+}
+
+.shake{
+    animation:shake .4s;
+}
+
+@keyframes shake{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-12px);}
+    50%{transform:translateX(12px);}
+    75%{transform:translateX(-12px);}
+    100%{transform:translateX(0);}
+}
+
+.author{
+    margin-top:35px;
+    font-size:25px;
+    color:white;
+
+    text-shadow:0 0 10px black;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🚂 Дыбыс пойызы 🚂</h1>
+
+    <div class="score">
+        Ұпай: <span id="score">0</span>
+    </div>
+
+    <div class="letters" id="letters"></div>
+
+    <div class="trains">
+
+        <!-- Дауысты -->
+        <div class="train">
+
+            <div class="engine"></div>
+
+            <div class="wagon vowel" id="vowelWagon">
+
+                <h2>Дауысты дыбыстар</h2>
+
+                <div class="dropzone" id="vowelZone"></div>
+
+            </div>
+
+        </div>
+
+        <!-- Дауыссыз -->
+        <div class="train">
+
+            <div class="engine"></div>
+
+            <div class="wagon consonant" id="consonantWagon">
+
+                <h2>Дауыссыз дыбыстар</h2>
+
+                <div class="dropzone" id="consonantZone"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="author">
+        Авторы: umittoibaeva
+    </div>
+
+</div>
+
+<!-- Дыбыстар -->
+
+<audio id="correctSound"
+src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=success-1-6297.mp3">
+</audio>
+
+<audio id="wrongSound"
+src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_4a1f3f5d35.mp3?filename=error-2-126514.mp3">
+</audio>
+
+<script>
+
+const vowels = [
+'А','Ә','Е','И','І','О','Ө','Ұ','Ү','У','Ы'
+];
+
+const consonants = [
+'Б','В','Г','Ғ','Д','Ж','З','Й',
+'К','Қ','Л','М','Н','Ң','П',
+'Р','С','Т','Ф','Х','Һ','Ц','Ч','Ш'
+];
+
+const allLetters = [
+...vowels.slice(0,8),
+...consonants.slice(0,12)
+];
+
+allLetters.sort(() => Math.random() - 0.5);
+
+const lettersContainer = document.getElementById("letters");
+
+let score = 0;
+
+allLetters.forEach(letter => {
+
+    const div = document.createElement("div");
+
+    div.className = "letter";
+    div.textContent = letter;
+
+    div.draggable = true;
+
+    div.addEventListener("dragstart", e => {
+
+        e.dataTransfer.setData("letter", letter);
+
+    });
+
+    lettersContainer.appendChild(div);
+
+});
+
+function createDrop(zoneId, type, wagonId){
+
+    const zone = document.getElementById(zoneId);
+
+    zone.addEventListener("dragover", e => {
+        e.preventDefault();
+    });
+
+    zone.addEventListener("drop", e => {
+
+        e.preventDefault();
+
+        const letter = e.dataTransfer.getData("letter");
+
+        let correct = false;
+
+        if(type === "vowel" && vowels.includes(letter)){
+            correct = true;
+        }
+
+        if(type === "consonant" && consonants.includes(letter)){
+            correct = true;
+        }
+
+        const wagon = document.getElementById(wagonId);
+
+        if(correct){
+
+            document.getElementById("correctSound").play();
+
+            wagon.classList.add("move");
+
+            setTimeout(() => {
+                wagon.classList.remove("move");
+            },500);
+
+            score++;
+
+            document.getElementById("score").textContent = score;
+
+            const small = document.createElement("div");
+
+            small.className = "smallLetter";
+            small.textContent = letter;
+
+            zone.appendChild(small);
+
+            document.querySelectorAll(".letter").forEach(el => {
+
+                if(el.textContent === letter){
+
+                    el.remove();
+
+                }
+
+            });
+
+        }
+
+        else{
+
+            document.getElementById("wrongSound").play();
+
+            wagon.classList.add("shake");
+
+            setTimeout(() => {
+
+                wagon.classList.remove("shake");
+
+            },400);
+
+        }
+
+    });
+
+}
+
+createDrop("vowelZone", "vowel", "vowelWagon");
+
+createDrop("consonantZone", "consonant", "consonantWagon");
+
+</script>
+
+</body>
+</html>

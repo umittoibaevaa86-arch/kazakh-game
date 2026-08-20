@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEFIS MASTER QUIZ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;700&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #EAF8FF 0%, #E8E3FF 50%, #BFE6FF 100%);
+            min-height: 100vh; 
+            color: #1e293b; 
+            overflow-x: hidden; 
+        }
+        
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        
+        canvas#bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        
+        .timer-circle { stroke-dasharray: 283; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+        .scale-on-hover:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 min-h-screen">
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="game-container" class="w-full max-w-2xl relative z-10">
+        <div id="start-screen" class="glass p-12 text-center border-white/50">
+            <h1 class="text-6xl font-bold text-blue-600 mb-6">✨ DEFIS MASTER</h1>
+            <p class="text-xl mb-8 text-slate-600">Дефис арқылы жазылатын сөздерді анықтау квестіне дайынсыз ба?</p>
+            <button onclick="startGame()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-12 rounded-full text-2xl shadow-xl transition-all hover:scale-105">БАСТАУ</button>
+        </div>
+
+        <div id="quiz-ui" class="hidden">
+            <div class="glass p-4 flex justify-between items-center mb-6 text-sm font-bold shadow-lg">
+                <div class="flex gap-4">
+                    <span>XP: <span id="xp" class="text-blue-600">0</span></span>
+                    <span>Score: <span id="score" class="text-green-600">0</span></span>
+                </div>
+                <div class="relative w-12 h-12">
+                    <svg class="w-12 h-12 -rotate-90">
+                        <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="4" fill="transparent" class="text-blue-100"/>
+                        <circle id="timer-bar" cx="24" cy="24" r="20" stroke="currentColor" stroke-width="4" fill="transparent" class="text-blue-500 timer-circle"/>
+                    </svg>
+                    <span id="timer" class="absolute inset-0 flex items-center justify-center text-lg">10</span>
+                </div>
+            </div>
+
+            <div id="question-card" class="glass p-8 mb-6 text-center shadow-2xl">
+                <div class="mb-4 text-slate-400 text-sm" id="progress-text">1 / 10</div>
+                <h2 id="question-text" class="text-3xl font-bold mb-8">Сұрақ...</h2>
+                <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <div id="feedback-overlay" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4 bg-white/40 backdrop-blur-sm">
+            <div id="feedback-card" class="glass p-8 max-w-md w-full text-center border-4">
+                <h2 id="feedback-status" class="text-4xl font-bold mb-4">✅</h2>
+                <p id="correct-answer-text" class="text-3xl font-bold text-blue-700 mb-4"></p>
+                <p id="explanation-text" class="text-lg text-slate-700"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-auto p-6 text-blue-400 font-semibold italic">Авторы: umittoibaeva</footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const icons = ['📚', '✏️', '📝', '🎓', '📖', '📐', '🧮', 'Қ', 'Ә', 'Ұ', '💡', '🌍'];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize;
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 30 + 10;
+                this.icon = icons[Math.floor(Math.random() * icons.length)];
+                this.alpha = Math.random() * 0.2 + 0.1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.font = `${this.size}px Arial`;
+                ctx.fillText(this.icon, this.x, this.y);
+            }
+        }
+
+        for(let i=0; i<30; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        const questions = [
+            { q: "Қай сөз дефис арқылы жазылады?", options: ["бара бара", "теміржол", "бас тарту", "он бес"], correct: "бара бара", explain: "Қайталама қос сөздер дефис арқылы жазылады: бара-бара." },
+            { q: "Қай сөз дефис арқылы жазылады?", options: ["жап жақсы", "өте жақсы", "аса жақсы", "жақсырақ"], correct: "жап жақсы", explain: "Күшейткіш буын арқылы жасалған сөздер дефис арқылы жазылады: жап-жақсы." },
+            { q: "Қай сөз дефис арқылы жазылады?", options: ["қып қызыл", "қызыл гүл", "қызыл алма", "қызыл түс"], correct: "қып қызыл", explain: "Күшейткіш буынмен жасалған сын есімдер дефис арқылы жазылады: қып-қызыл." },
+            { q: "Қай атау дефис арқылы жазылады?", options: ["премьер министр", "мектеп директоры", "сынып жетекшісі", "қазақ тілі мұғалімі"], correct: "премьер министр", explain: "Ғылыми дәреже, атақ және қызмет атауларының кейбірі дефис арқылы жазылады: премьер-министр." },
+            { q: "Қай мамандық атауы дефис арқылы жазылады?", options: ["әнші композитор", "музыка мұғалімі", "домбырашы", "суретші"], correct: "әнші композитор", explain: "Қос қызмет немесе мамандық атаулары дефис арқылы жазылады: әнші-композитор." },
+            { q: "Қай есімде дефис қойылып жазылады?", options: ["әл Фараби", "әлфараби", "Әл Фараби", "Әлфараби"], correct: "әл Фараби", explain: "Араб есімдеріндегі әл, ар, аш, аз, әд, бен элементтерінен кейін дефис қойылады: әл-Фараби." },
+            { q: "Қай сөз дефиспен жазылады?", options: ["7 сынып", "жетінші сынып", "7сынып", "жеті сынып"], correct: "7 сынып", explain: "Реттік сан есім цифрмен жазылса, өзінен кейінгі сөзбен дефис арқылы байланысады: 7-сынып." },
+            { q: "Қай сөзде дефис дұрыс қойылған?", options: ["15 үй", "он бес үй", "он бесінші үй", "үй 15"], correct: "15 үй", explain: "Цифрмен берілген реттік сан есім мен анықталатын сөздің арасына дефис қойылады: 15-үй." },
+            { q: "Қай сөз дефис арқылы жазылады?", options: ["бірде бір", "бір бір", "бір кезде", "бір адам"], correct: "бірде бір", explain: "Қос сөздер негізінен дефис арқылы жазылады: бірде-бір." },
+            { q: "Қай сөз дефис арқылы жазылады?", options: ["жақсылы жаманды", "жақсы адам", "жаман адам", "жақсы жаман"], correct: "жақсылы жаманды", explain: "Мағыналас және қарама-қарсы мәнді қос сөздер дефис арқылы жазылады: жақсылы-жаманды." }
+        ];
+
+        let state = { index: 0, xp: 0, score: 0, combo: 0, maxCombo: 0, timer: 10, interval: null, correctCount: 0, wrongCount: 0, startTime: 0 };
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(type === 'correct' ? 600 : 200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-ui').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.index >= questions.length) { endGame(); return; }
+            const q = questions[state.index];
+            const options = shuffle([...q.options]);
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('progress-text').innerText = `${state.index + 1} / 10`;
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'glass p-6 text-xl font-bold transition-all scale-on-hover active:scale-95 border-2 hover:border-blue-300';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt);
+                grid.appendChild(btn);
+            });
+            startTimer();
+            state.startTime = Date.now();
+        }
+
+        function startTimer() {
+            state.timer = 10;
+            document.getElementById('timer').innerText = state.timer;
+            clearInterval(state.interval);
+            state.interval = setInterval(() => {
+                state.timer--;
+                document.getElementById('timer').innerText = state.timer;
+                document.getElementById('timer-bar').style.strokeDashoffset = (1 - state.timer / 10) * 283;
+                if (state.timer <= 0) { clearInterval(state.interval); checkAnswer(null); }
+            }, 1000);
+        }
+
+        function checkAnswer(answer) {
+            clearInterval(state.interval);
+            const q = questions[state.index];
+            const isCorrect = answer === q.correct;
+            const overlay = document.getElementById('feedback-overlay');
+            const status = document.getElementById('feedback-status');
+            
+            if (isCorrect) {
+                state.score += 10; state.xp += 100; state.correctCount++;
+                status.innerText = "✅ ДҰРЫС!";
+                status.className = "text-5xl font-bold mb-4 text-green-500";
+                playSound('correct');
+            } else {
+                state.combo = 0; state.wrongCount++;
+                status.innerText = "❌ ҚАТЕ!";
+                status.className = "text-5xl font-bold mb-4 text-red-500";
+                playSound('wrong');
+            }
+            
+            document.getElementById('correct-answer-text').innerText = q.correct.replace(" ", "-");
+            document.getElementById('explanation-text').innerText = q.explain;
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                state.index++;
+                renderQuestion();
+            }, 3000);
+        }
+
+        function endGame() {
+            document.getElementById('quiz-ui').classList.add('hidden');
+            const end = document.createElement('div');
+            end.className = 'glass p-12 text-center';
+            end.innerHTML = `<h1 class="text-6xl mb-4">🏆</h1><h2 class="text-3xl font-bold mb-6 text-blue-600">DEFIS MASTER!</h2><div class="space-y-2 mb-8">
+                <p>⭐ Жалпы ұпай: ${state.score}</p>
+                <p>✔ Дұрыс: ${state.correctCount} | ❌ Қате: ${state.wrongCount}</p>
+            </div><button onclick="location.reload()" class="bg-blue-500 text-white px-8 py-3 rounded-full font-bold">Жаңа ойын</button>`;
+            document.getElementById('game-container').appendChild(end);
+        }
+    </script>
+</body>
+</html>

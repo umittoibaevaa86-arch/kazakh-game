@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дыбыстар зертханасы</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Trebuchet MS', sans-serif;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:
+    linear-gradient(rgba(170,220,255,0.86), rgba(170,220,255,0.86)),
+    url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1800&auto=format&fit=crop');
+    background-size:cover;
+    background-position:center;
+    padding:20px;
+}
+
+.container{
+    max-width:1500px;
+    margin:auto;
+}
+
+.title{
+    text-align:center;
+    font-size:72px;
+    font-weight:bold;
+    color:#fff;
+    margin-bottom:25px;
+
+    text-shadow:
+    0 0 5px #fff,
+    0 0 10px #00eaff,
+    0 0 20px #00eaff,
+    0 0 40px #ff00ff;
+
+    animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+    from{
+        text-shadow:
+        0 0 5px #fff,
+        0 0 15px #00eaff,
+        0 0 30px #00eaff;
+    }
+
+    to{
+        text-shadow:
+        0 0 10px #fff,
+        0 0 25px #ff00ff,
+        0 0 45px #00eaff;
+    }
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:30px;
+}
+
+.box{
+    background:rgba(0,85,170,0.8);
+    color:white;
+    border-radius:25px;
+    padding:20px 35px;
+    font-size:32px;
+    font-weight:bold;
+    border:3px solid #7ef9ff;
+    box-shadow:0 0 20px #00eaff;
+}
+
+.instruction{
+    flex:1;
+    text-align:center;
+    background:white;
+    border-radius:25px;
+    padding:22px;
+    font-size:28px;
+    font-weight:bold;
+    color:#0b2b63;
+    box-shadow:0 0 20px white;
+}
+
+.game-area{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.zone{
+    flex:1;
+    min-height:350px;
+    border-radius:35px;
+    padding:25px;
+}
+
+.native{
+    background:rgba(0,90,120,0.82);
+    border:5px solid #47ff7d;
+    box-shadow:0 0 30px #47ff7d;
+}
+
+.borrowed{
+    background:rgba(75,0,120,0.82);
+    border:5px solid #ff6eff;
+    box-shadow:0 0 30px #ff6eff;
+}
+
+.zone h2{
+    text-align:center;
+    color:white;
+    font-size:42px;
+    margin-bottom:15px;
+    text-shadow:0 0 15px white;
+}
+
+.zone p{
+    text-align:center;
+    color:white;
+    font-size:24px;
+    margin-bottom:20px;
+}
+
+.dropzone{
+    min-height:200px;
+    border:4px dashed rgba(255,255,255,0.7);
+    border-radius:25px;
+    padding:15px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-content:flex-start;
+}
+
+.words{
+    margin-top:40px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    justify-content:center;
+}
+
+.word{
+    background:white;
+    border-radius:20px;
+    padding:16px 30px;
+    font-size:30px;
+    font-weight:bold;
+    color:#17356d;
+    cursor:grab;
+    border:3px solid #88dfff;
+    box-shadow:0 0 15px rgba(255,255,255,0.9);
+    transition:0.25s;
+    user-select:none;
+}
+
+.word:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 25px #00eaff;
+}
+
+.correct{
+    background:#8eff9e !important;
+    color:#004114 !important;
+    animation:correctAnim 0.5s;
+}
+
+.wrong{
+    background:#ff9f9f !important;
+    animation:wrongAnim 0.4s;
+}
+
+@keyframes correctAnim{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.18);}
+    100%{transform:scale(1);}
+}
+
+@keyframes wrongAnim{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-10px);}
+    50%{transform:translateX(10px);}
+    75%{transform:translateX(-10px);}
+    100%{transform:translateX(0);}
+}
+
+.bottom{
+    margin-top:35px;
+    text-align:center;
+}
+
+.restart{
+    background:#006eff;
+    color:white;
+    border:none;
+    border-radius:22px;
+    padding:18px 45px;
+    font-size:30px;
+    cursor:pointer;
+    box-shadow:0 0 20px #00d9ff;
+    transition:0.3s;
+}
+
+.restart:hover{
+    transform:scale(1.07);
+}
+
+.author{
+    margin-top:30px;
+    font-size:30px;
+    font-weight:bold;
+    color:#004ba0;
+    text-shadow:0 0 10px white;
+}
+
+@media(max-width:900px){
+
+    .title{
+        font-size:45px;
+    }
+
+    .word{
+        font-size:22px;
+    }
+
+    .zone h2{
+        font-size:30px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="title">🧪 Дыбыстар зертханасы</div>
+
+    <div class="top">
+
+        <div class="box">
+            🏆 Ұпай: <span id="score">0</span>
+        </div>
+
+        <div class="instruction">
+            🔊 Сөздерді оқып, тиісті топқа сүйреп апарыңыз!
+        </div>
+
+        <div class="box">
+            ⭐ Деңгей: 1/1
+        </div>
+
+    </div>
+
+    <div class="game-area">
+
+        <div class="zone native">
+
+            <h2>🔊 Төл дыбыстар</h2>
+
+            <p>
+                Қазақ тілінде ертеден бар, өзімізге тән дыбыстар.
+            </p>
+
+            <div class="dropzone" id="nativeZone"></div>
+
+        </div>
+
+        <div class="zone borrowed">
+
+            <h2>🔊 Кірме сөздер</h2>
+
+            <p>
+                Басқа тілдерден енген, жат дыбыстар.
+            </p>
+
+            <div class="dropzone" id="borrowedZone"></div>
+
+        </div>
+
+    </div>
+
+    <div class="words" id="wordsContainer">
+
+        <!-- Төл сөздер -->
+        <div class="word" draggable="true" data-type="native">ана</div>
+        <div class="word" draggable="true" data-type="native">су</div>
+        <div class="word" draggable="true" data-type="native">жүрек</div>
+        <div class="word" draggable="true" data-type="native">кітап</div>
+        <div class="word" draggable="true" data-type="native">қалам</div>
+        <div class="word" draggable="true" data-type="native">дала</div>
+
+        <!-- Кірме сөздер -->
+        <div class="word" draggable="true" data-type="borrowed">компьютер</div>
+        <div class="word" draggable="true" data-type="borrowed">интернет</div>
+        <div class="word" draggable="true" data-type="borrowed">телефон</div>
+        <div class="word" draggable="true" data-type="borrowed">музыка</div>
+        <div class="word" draggable="true" data-type="borrowed">спорт</div>
+        <div class="word" draggable="true" data-type="borrowed">футбол</div>
+        <div class="word" draggable="true" data-type="borrowed">проект</div>
+        <div class="word" draggable="true" data-type="borrowed">менеджер</div>
+        <div class="word" draggable="true" data-type="borrowed">буфет</div>
+        <div class="word" draggable="true" data-type="borrowed">билет</div>
+        <div class="word" draggable="true" data-type="borrowed">сервис</div>
+        <div class="word" draggable="true" data-type="borrowed">дизайн</div>
+
+    </div>
+
+    <div class="bottom">
+
+        <button class="restart" onclick="restartGame()">
+            🔄 Қайта бастау
+        </button>
+
+        <div class="author">
+            Авторы: umittoibaeva
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Дұрыс жауап дыбысы -->
+<audio id="correctSound">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mp3">
+</audio>
+
+<!-- Қате жауап дыбысы -->
+<audio id="wrongSound">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3" type="audio/mp3">
+</audio>
+
+<script>
+
+let score = 0;
+
+const words = document.querySelectorAll(".word");
+
+const nativeZone = document.getElementById("nativeZone");
+const borrowedZone = document.getElementById("borrowedZone");
+
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+
+words.forEach(word=>{
+
+    word.addEventListener("dragstart", ()=>{
+
+        word.classList.add("dragging");
+
+    });
+
+    word.addEventListener("dragend", ()=>{
+
+        word.classList.remove("dragging");
+
+    });
+
+});
+
+function activateDrop(zone, type){
+
+    zone.addEventListener("dragover", e=>{
+
+        e.preventDefault();
+
+    });
+
+    zone.addEventListener("drop", e=>{
+
+        e.preventDefault();
+
+        const dragged = document.querySelector(".dragging");
+
+        if(!dragged) return;
+
+        const wordType = dragged.dataset.type;
+
+        if(wordType === type){
+
+            zone.appendChild(dragged);
+
+            dragged.classList.add("correct");
+
+            correctSound.currentTime = 0;
+            correctSound.play();
+
+            score++;
+
+            document.getElementById("score").innerText = score;
+
+            setTimeout(()=>{
+
+                dragged.classList.remove("correct");
+
+            },500);
+
+            dragged.setAttribute("draggable","false");
+            dragged.style.cursor="default";
+
+        }
+
+        else{
+
+            dragged.classList.add("wrong");
+
+            wrongSound.currentTime = 0;
+            wrongSound.play();
+
+            setTimeout(()=>{
+
+                dragged.classList.remove("wrong");
+
+            },500);
+
+        }
+
+    });
+
+}
+
+activateDrop(nativeZone, "native");
+activateDrop(borrowedZone, "borrowed");
+
+function restartGame(){
+
+    location.reload();
+
+}
+
+</script>
+
+</body>
+</html>

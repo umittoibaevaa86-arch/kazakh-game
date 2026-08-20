@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СӨЗ HUNTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --success: #22c55e; --error: #ef4444; --text-dark: #1e293b; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Poppins', sans-serif; background: #F3FAFF; }
+
+        #game-container { 
+            width: 100vw; height: 100vh; position: relative; 
+            background: linear-gradient(180deg, #F3FAFF 0%, #DCEEFF 25%, #B8DDFF 50%, #8EC5FF 75%, #6EA8FF 100%);
+        }
+
+        .task-container { position: absolute; top: 80px; width: 100%; display: flex; justify-content: center; z-index: 15; pointer-events: none; }
+        .task-text { 
+            padding: 15px 30px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); 
+            border-radius: 50px; font-size: 26px; font-weight: 700; color: #1e3a8a; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #fff;
+        }
+
+        .decor { position: absolute; border-radius: 50%; pointer-events: none; z-index: 1; }
+
+        .ui-top { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around; z-index: 20; color: #1e3a8a; font-weight: 700; font-size: 1.2rem; pointer-events: none; }
+        
+        .card { 
+            position: absolute; padding: 15px 25px; border-radius: 20px; background: rgba(255,255,255,0.95); 
+            cursor: pointer; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            z-index: 100; font-weight: 700; color: var(--text-dark);
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: auto; /* Clickable */
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .card:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(99, 102, 241, 0.4); }
+
+        #target-card { 
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); 
+            padding: 20px 40px; font-size: 2.5rem; border-radius: 30px; border: 4px solid var(--primary); 
+            background: white; z-index: 200; pointer-events: none;
+        }
+
+        .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.9); z-index: 500; }
+        button { padding: 15px 40px; font-size: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 6px 0 #4338ca; pointer-events: auto; }
+        
+        .footer { position: absolute; bottom: 10px; width: 100%; text-align: center; color: #1e3a8a; font-weight: 700; font-size: 0.9rem; z-index: 50; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="ui-top" id="ui-top" style="display: none;">
+        <div>XP: <span id="xp">0</span></div>
+        <div>Score: <span id="score">0</span></div>
+        <div>Combo: <span id="combo">0</span></div>
+    </div>
+    
+    <div class="task-container" id="task-ui" style="display: none;">
+        <div class="task-text">🎯 Дұрыс жұпты тауып, біріккен сөз жаса!</div>
+    </div>
+
+    <div id="target-card" class="card" style="display: none;"></div>
+
+    <div id="start-screen" class="overlay">
+        <h1>⚔️ СӨЗ HUNTER ⚔️</h1>
+        <button onclick="game.start()">▶ ОЙЫНДЫ БАСТАУ</button>
+    </div>
+    <div class="footer">────────────────────<br>Авторы: Umittoibaeva<br>────────────────────</div>
+</div>
+
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, dur) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
+    }
+
+    const flyingWords = ["бір", "ақ", "жеті", "барыс", "қазан", "бақан", "алты", "жол", "тұмсық", "бақа", "сүйек", "көл", "суық", "мүйіз", "қарақшы", "торғай", "қу"];
+    const questions = [
+        {first:"бір", second:"қазан", result:"бірқазан"}, {first:"көл", second:"бақа", result:"көлбақа"},
+        {first:"жеті", second:"қарақшы", result:"жетіқарақшы"}, {first:"жол", second:"барыс", result:"жолбарыс"},
+        {first:"мүйіз", second:"тұмсық", result:"мүйізтұмсық"}, {first:"суық", second:"торғай", result:"суықторғай"},
+        {first:"ақ", second:"қу", result:"аққу"}, {first:"алты", second:"бақан", result:"алтыбақан"},
+        {first:"ақ", second:"сүйек", result:"ақсүйек"}
+    ];
+
+    const game = {
+        score: 0, xp: 0, combo: 0, currentQ: 0, words: [], decors: [], speed: 0.2, // Баяу жылдамдық
+        start() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('ui-top').style.display = 'flex';
+            document.getElementById('task-ui').style.display = 'flex';
+            this.createDecor();
+            this.nextQuestion();
+            this.animate();
+        },
+        createDecor() {
+            for(let i=0; i<60; i++) {
+                const d = document.createElement('div');
+                d.className = 'decor';
+                d.style.width = d.style.height = (Math.random()*30 + 10) + 'px';
+                d.style.left = Math.random() * 100 + '%';
+                d.style.top = Math.random() * 100 + '%';
+                d.style.background = `rgba(255,255,255,0.2)`;
+                d.vx = (Math.random() - 0.5) * 0.1;
+                d.vy = (Math.random() - 0.5) * 0.1;
+                document.getElementById('game-container').appendChild(d);
+                this.decors.push(d);
+            }
+        },
+        nextQuestion() {
+            if (this.currentQ >= questions.length) return this.gameOver();
+            const target = document.getElementById('target-card');
+            target.textContent = questions[this.currentQ].first.toUpperCase();
+            target.style.display = 'flex';
+            this.spawnWords();
+        },
+        spawnWords() {
+            this.words.forEach(w => w.remove());
+            this.words = [];
+            flyingWords.forEach(text => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.textContent = text;
+                el.style.left = Math.random() * 70 + 10 + '%';
+                el.style.top = Math.random() * 50 + 30 + '%';
+                el.vx = (Math.random() - 0.5) * this.speed;
+                el.vy = (Math.random() - 0.5) * this.speed;
+                // Click events
+                el.addEventListener('mousedown', (e) => { e.stopPropagation(); this.check(text, el); });
+                document.getElementById('game-container').appendChild(el);
+                this.words.push(el);
+            });
+        },
+        check(word, el) {
+            if (word === questions[this.currentQ].second) {
+                playTone(600, 0.3);
+                this.score += 100; this.xp += 100; this.combo++;
+                this.updateUI();
+                this.success(el);
+            } else {
+                playTone(150, 0.2);
+                el.style.animation = 'none';
+                void el.offsetWidth;
+                el.style.animation = 'shake 0.3s';
+            }
+        },
+        success(el) {
+            el.style.pointerEvents = "none";
+            el.style.transition = "all 0.4s ease-in-out";
+            el.style.left = "50%"; el.style.top = "40%";
+            setTimeout(() => {
+                document.getElementById('target-card').textContent = "✨ " + questions[this.currentQ].result.toUpperCase() + " ✨";
+                setTimeout(() => { this.currentQ++; this.nextQuestion(); }, 2000);
+            }, 400);
+        },
+        animate() {
+            this.words.forEach(w => {
+                let x = parseFloat(w.style.left); let y = parseFloat(w.style.top);
+                if (x < 2 || x > 88) w.vx *= -1;
+                if (y < 25 || y > 90) w.vy *= -1;
+                w.style.left = (x + w.vx) + '%'; w.style.top = (y + w.vy) + '%';
+            });
+            this.decors.forEach(d => {
+                let x = parseFloat(d.style.left); let y = parseFloat(d.style.top);
+                d.style.left = (x + d.vx) + '%'; d.style.top = (y + d.vy) + '%';
+            });
+            requestAnimationFrame(() => this.animate());
+        },
+        updateUI() {
+            document.getElementById('score').textContent = this.score;
+            document.getElementById('xp').textContent = this.xp;
+            document.getElementById('combo').textContent = this.combo;
+        },
+        gameOver() {
+            document.getElementById('game-container').innerHTML = `<div class="overlay"><h1>🏆 Жеңіс!</h1><button onclick="location.reload()">🔄 ҚАЙТА</button></div>`;
+        }
+    };
+</script>
+</body>
+</html>
+</html>

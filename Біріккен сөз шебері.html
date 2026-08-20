@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>⭐ БІРІККЕН СӨЗ ШЕБЕРІ ⭐</title>
+    <style>
+        :root { --neon-blue: #00f2ff; --neon-purple: #9d00ff; --bg-grad: linear-gradient(135deg, #a1c4fd, #c2e9fb, #e0c3fc); }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-grad); color: #1E3A8A; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        #sound-toggle { position: fixed; top: 20px; right: 20px; z-index: 500; padding: 15px; cursor: pointer; background: rgba(255,255,255,0.8); border-radius: 50%; border: none; font-size: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        h1 { font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px var(--neon-blue); margin: 20px 0; }
+        .stats-bar { display: flex; gap: 20px; background: rgba(255,255,255,0.8); padding: 10px 25px; border-radius: 50px; font-weight: 700; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .main-container { display: flex; gap: 40px; padding: 20px; width: 95%; max-width: 1100px; justify-content: center; }
+        .game-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; flex: 2; }
+        .card { background: #FFFFFF; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; font-weight: 700; font-size: 20px; color: #1E3A8A; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
+        .card:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--neon-blue); }
+        .card.selected { background: var(--neon-blue); color: white; }
+        .card.wrong { background: #ff4d4d; animation: shake 0.5s; color: white; }
+        @keyframes shake { 0%, 100% {transform: translateX(0)} 25% {transform: translateX(-10px)} 75% {transform: translateX(10px)} }
+        #found-words { flex: 1; background: rgba(255,255,255,0.7); padding: 20px; border-radius: 15px; max-height: 500px; overflow-y: auto; }
+        #victory-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); color: white; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
+        .footer { margin-top: auto; padding: 20px; font-weight: 600; color: #1E3A8A; }
+    </style>
+</head>
+<body>
+
+<button id="sound-toggle" onclick="toggleSound()">🔊</button>
+<h1>⭐ БІРІККЕН СӨЗ ШЕБЕРІ ⭐</h1>
+
+<div class="stats-bar">
+    <div>Ұпай: <span id="score">0</span></div>
+    <div>XP: <span id="xp">0</span></div>
+    <div>Табылғаны: <span id="counter">0/14</span></div>
+</div>
+
+<div class="main-container">
+    <div class="game-grid" id="grid"></div>
+    <div id="found-words">
+        <h3>📚 Табылған сөздер</h3>
+        <ul id="history"></ul>
+    </div>
+</div>
+
+<div id="victory-screen">
+    <h1 style="color: gold;">🏆 ҚҰТТЫҚТАЙМЫЗ!</h1>
+    <p id="final-stats"></p>
+    <button onclick="location.reload()" style="padding: 15px 30px; font-size: 20px; cursor: pointer;">🔄 ҚАЙТА БАСТАУ</button>
+</div>
+
+<div class="footer">────────────────────────<br>Авторы: Umittoibaeva<br>────────────────────────</div>
+
+<script>
+    const correctPairs = [
+        { first: "ақ", second: "сақал", result: "АҚСАҚАЛ" },
+        { first: "ит", second: "мұрын", result: "ИТМҰРЫН" },
+        { first: "сүт", second: "қоректілер", result: "СҮТҚОРЕКТІЛЕР" },
+        { first: "өнер", second: "кәсіп", result: "ӨНЕРКӘСІП" },
+        { first: "бет", second: "ашар", result: "БЕТАШАР" },
+        { first: "баспа", second: "сөз", result: "БАСПАСӨЗ" },
+        { first: "ас", second: "қазан", result: "АСҚАЗАН" },
+        { first: "сегіз", second: "көз", result: "СЕГІЗКӨЗ" },
+        { first: "тоқ", second: "ішек", result: "ТОҚІШЕК" },
+        { first: "соқыр", second: "теке", result: "СОҚЫРТЕКЕ" },
+        { first: "ара", second: "қатынас", result: "АРАҚАТЫНАС" },
+        { first: "жол", second: "ақы", result: "ЖОЛАҚЫ" },
+        { first: "еш", second: "қашан", result: "ЕШҚАШАН" },
+        { first: "ала", second: "көз", result: "АЛАКӨЗ" }
+    ];
+
+    let score = 0, xp = 0, selected = [], foundCount = 0, soundEnabled = true;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(freq, type, duration) {
+        if (!soundEnabled) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        document.getElementById('sound-toggle').innerText = soundEnabled ? '🔊' : '🔇';
+    }
+
+    function init() {
+        playSound(600, 'sine', 0.5);
+        const grid = document.getElementById('grid');
+        let words = [];
+        correctPairs.forEach(p => words.push(p.first, p.second));
+        words.sort(() => Math.random() - 0.5);
+        words.forEach(w => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerText = w;
+            div.onmouseover = () => playSound(100, 'sine', 0.05);
+            div.onclick = () => { playSound(300, 'sine', 0.1); select(div, w); };
+            grid.appendChild(div);
+        });
+    }
+
+    function select(el, word) {
+        if(el.classList.contains('selected') || selected.length >= 2) return;
+        el.classList.add('selected');
+        selected.push({el, word});
+        if(selected.length === 2) check();
+    }
+
+    function check() {
+        const [s1, s2] = selected;
+        const match = correctPairs.find(p => (p.first === s1.word && p.second === s2.word) || (p.second === s1.word && p.first === s2.word));
+        
+        if(match) {
+            playSound(800, 'square', 0.8);
+            score += 100; xp += 50; foundCount++;
+            document.getElementById('score').innerText = score;
+            document.getElementById('xp').innerText = xp;
+            document.getElementById('counter').innerText = foundCount + "/14";
+            document.getElementById('history').innerHTML += `<li>✅ ${match.result}</li>`;
+            setTimeout(() => { s1.el.style.visibility = 'hidden'; s2.el.style.visibility = 'hidden'; }, 500);
+            if(foundCount === 14) { playSound(1000, 'sine', 2); document.getElementById('victory-screen').style.display = 'flex'; }
+        } else {
+            playSound(150, 'sawtooth', 0.3);
+            s1.el.classList.add('wrong'); s2.el.classList.add('wrong');
+            setTimeout(() => { s1.el.classList.remove('selected', 'wrong'); s2.el.classList.remove('selected', 'wrong'); }, 500);
+        }
+        selected = [];
+    }
+
+    init();
+</script>
+</body>
+</html>

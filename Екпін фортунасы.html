@@ -1,0 +1,193 @@
+
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Екпін Фортунасы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            margin: 0; padding: 0; min-height: 100vh;
+            font-family: 'Georgia', serif; 
+            background-image: url('https://i.pinimg.com/736x/c9/fc/f0/c9fcf0beeb3430dfa4b5a9361e0bf8ea.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #3e2723;
+            overflow-x: hidden;
+        }
+        .ui-backdrop {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .wheel-container { position: relative; display: inline-block; }
+        .pointer-luxury { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); z-index: 50; width: 36px; height: 55px; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.3)); pointer-events: none; }
+        .pointer-luxury-shape { width: 100%; height: 100%; background: linear-gradient(135deg, #FFF0A5 0%, #F8D46A 35%, #E2B84B 65%, #B8860B 100%); clip-path: polygon(0% 0%, 100% 0%, 85% 60%, 50% 100%, 15% 60%); }
+        .question-card { background: linear-gradient(135deg, #FFFDF7 0%, #FFF7ED 100%) !important; border: 3px solid #D4AF37 !important; border-top: 6px solid #D4AF37 !important; border-radius: 20px !important; padding: 24px !important; box-shadow: 0 8px 20px rgba(0,0,0,0.08), inset 0 2px 4px rgba(255,255,255,0.9) !important; }
+        .question-text { font-family: 'Poppins', sans-serif !important; font-size: 26px !important; color: #4B321A !important; text-align: center !important; line-height: 1.6 !important; font-weight: 600 !important; }
+        .wood-panel { background: linear-gradient(180deg, #FFFDF7 0%, #FFF7EB 100%) !important; border: 3px solid #D4AF37 !important; border-radius: 24px !important; box-shadow: 0 15px 35px rgba(0,0,0,.15), inset 0 1px 2px rgba(255,255,255,.8) !important; }
+        .premium-title { background: linear-gradient(180deg, #4a2c1a 0%, #2a1a0f 100%); border: 6px solid #d4af37; box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 15px rgba(255,255,255,0.1); border-radius: 50px; padding: 15px 40px; color: #fceab1; font-family: 'Cinzel', serif; letter-spacing: 3px; }
+        #wheelCanvas { transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); background: rgba(255,255,255,0.5); border-radius: 50%; border: 12px solid #D4AF37; display: block; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4">
+
+    <div class="mb-10">
+        <h1 class="premium-title text-3xl font-bold uppercase">Екпін Фортунасы</h1>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-8 items-center ui-backdrop border border-white/30">
+        <div class="wheel-container">
+            <div class="pointer-luxury"><div class="pointer-luxury-shape"></div></div>
+            <canvas id="wheelCanvas" width="500" height="500"></canvas>
+        </div>
+        <div class="w-16 bg-[#F8EAD2]/50 p-2 rounded flex flex-col items-center shadow-inner max-h-[500px] overflow-y-auto">
+            <div id="tracker" class="w-full text-center text-sm font-bold text-gray-800"></div>
+        </div>
+        <div class="wood-panel p-6 rounded-lg w-80 min-h-[400px] flex flex-col gap-4 text-[#4B321A]">
+            <h2 class="text-xl font-bold text-center border-b border-[#D4AF37] pb-2 text-[#8b5a2b]">Қазақ тілі екпіндері</h2>
+            <div id="quizArea" class="flex-grow">
+                <div class="question-card mb-4"><p id="qText" class="question-text">«Айналдыру» батырмасын басыңыз</p></div>
+                <div id="options" class="mt-4 flex flex-col gap-2"></div>
+            </div>
+            <div class="mt-6">
+                <button id="spinBtn" class="w-full bg-[#D4AF37] hover:bg-[#C8922B] text-white py-3 rounded-xl font-bold uppercase tracking-widest transition-all">Айналдыру</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-8 bg-black/50 px-6 py-2 rounded-full border border-yellow-500/50">
+        <span class="text-yellow-400 font-bold text-lg tracking-wider">Авторы: umittoibaeva</span>
+    </div>
+
+    <script>
+        // Дыбыстық эффектілер (Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+        function playCorrect() { playTone(600, 'sine', 0.5); setTimeout(() => playTone(800, 'sine', 0.5), 300); }
+        function playWrong() { playTone(200, 'sawtooth', 0.5); }
+
+        const quizData = [
+            { q: "Қазақ тілінде сөз екпіні көбіне қай буынға түседі?", options: ["Басы", "Ортасы", "Соңғы буын"], correct: 2 },
+            { q: "Екпін дегеніміз не?", options: ["Сөздің мағынасы", "Буынның көтеріңкі айтылуы", "Дауыс ырғағы"], correct: 1 },
+            { q: "«Оқушылар» сөзінде екпін қай буынға түседі?", options: ["О-", "қу-", "-лар"], correct: 2 },
+            { q: "«Кітапхана» сөзінде екпін қай буынға түседі?", options: ["Кі-", "тап-", "-на"], correct: 2 },
+            { q: "«Табиғат» сөзінде екпін қай буынға түседі?", options: ["Та-", "би-", "-ғат"], correct: 2 },
+            { q: "«Балалық» сөзінде екпін қай буынға түседі?", options: ["Ба-", "ла-", "-лық"], correct: 2 },
+            { q: "«Мектепке» сөзінде екпін қай буынға түседі?", options: ["Мек-", "теп-", "-ке"], correct: 2 },
+            { q: "«Достық» сөзінде екпін қай буынға түседі?", options: ["Дос-", "-тық"], correct: 1 },
+            { q: "«Балалар» сөзінде екпін қайда?", options: ["Ба-", "-лар"], correct: 1 },
+            { q: "Қай сөзде екпін дұрыс қойылған?", options: ["Балалар", "Бала́лар"], correct: 1 },
+            { q: "Екпін түспейтін қосымша сөз екпінін...", options: ["Ауыстырады", "Қабылдамайды", "Жояды"], correct: 1 },
+            { q: "«Баламын» сөзінде екпін қай буында?", options: ["Ба-", "-ла-"], correct: 1 },
+            { q: "«Оқушымын» сөзінде екпін қай буында?", options: ["О-", "-шы-"], correct: 1 },
+            { q: "«Келесің» сөзінде екпін қай буында?", options: ["Ке-", "-ле-"], correct: 1 },
+            { q: "«Жазушымыз» сөзінде екпін қай буында?", options: ["Жа-", "-шы-"], correct: 1 },
+            { q: "Қай сөзде екпін түспейтін қосымша бар?", options: ["Мектепке", "Оқушымын"], correct: 1 },
+            { q: "Қай сөзде екпін түспейтін қосымша жоқ?", options: ["Баламын", "Кітапхана"], correct: 1 },
+            { q: "«Барамын» сөзінде екпін қай буында?", options: ["Ба-", "-ра-"], correct: 1 },
+            { q: "Екпін түспейтін қосымша екпінді...", options: ["Қабылдамайды", "Қабылдайды"], correct: 0 },
+            { q: "Екпін түспейтін қосымша жалғанғанда екпін...", options: ["Алдыңғы буында", "Соңғыға ауысады"], correct: 0 }
+        ];
+
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const tracker = document.getElementById('tracker');
+        const spinBtn = document.getElementById('spinBtn');
+        const qText = document.getElementById('qText');
+        const optionsDiv = document.getElementById('options');
+
+        let currentQ = 0;
+        let angle = 0;
+
+        for(let i=1; i<=20; i++) {
+            tracker.innerHTML += `<div class="p-1 border-b border-[#d9a441]/30 w-full text-xs">${i}</div>`;
+        }
+
+        function drawWheel() {
+            const centerX = 250, centerY = 250, radius = 220;
+            ctx.clearRect(0, 0, 500, 500);
+            const palette = ["#FFF8EE", "#F5E8D3", "#F5C55A", "#D89A2B"];
+            for (let i = 0; i < 20; i++) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, (i * Math.PI * 2) / 20, ((i + 1) * Math.PI * 2) / 20);
+                ctx.fillStyle = palette[i % 4];
+                ctx.fill();
+                ctx.strokeStyle = "#8B5A2B";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate((i * Math.PI * 2) / 20 + Math.PI / 20);
+                ctx.fillStyle = "#3e2723";
+                ctx.font = "bold 12px Georgia";
+                ctx.fillText((i + 1).toString(), 140, 5);
+                ctx.restore();
+            }
+            ctx.beginPath(); ctx.arc(centerX, centerY, 40, 0, Math.PI * 2); ctx.fillStyle = "#D4AF37"; ctx.fill();
+        }
+
+        function spin() {
+            angle += 1500 + Math.random() * 1000;
+            canvas.style.transform = `rotate(${angle}deg)`;
+            setTimeout(showQuestion, 4000);
+        }
+
+        function showQuestion() {
+            if (currentQ >= quizData.length) {
+                qText.innerText = "Ойын аяқталды! Құттықтаймыз!";
+                optionsDiv.innerHTML = `<button id="restartBtn" class="w-full p-4 bg-[#D4AF37] hover:bg-[#C8922B] text-white rounded-xl font-bold uppercase tracking-widest transition-all">Қайта бастау</button>`;
+                document.getElementById('restartBtn').onclick = () => {
+                    currentQ = 0;
+                    Array.from(tracker.children).forEach(child => {
+                        child.style.background = 'transparent';
+                        child.style.color = '#1f2937';
+                    });
+                    qText.innerText = "«Айналдыру» батырмасын басыңыз";
+                    optionsDiv.innerHTML = '';
+                };
+                return;
+            }
+
+            const q = quizData[currentQ];
+            qText.innerText = `${currentQ + 1}: ${q.q}`;
+            optionsDiv.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-2 bg-[#8b5a2b] hover:bg-[#a67c52] rounded text-white text-sm transition-all';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(idx === q.correct) {
+                        playCorrect();
+                        tracker.children[currentQ].style.background = '#8b5a2b';
+                        tracker.children[currentQ].style.color = 'white';
+                        currentQ++;
+                        qText.innerText = "Дұрыс! Келесі сұраққа өтіңіз.";
+                        optionsDiv.innerHTML = '';
+                    } else {
+                        playWrong();
+                        qText.innerText = "Қате, қайталап көріңіз.";
+                    }
+                };
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        drawWheel();
+        spinBtn.onclick = spin;
+    </script>
+</body>
+</html>

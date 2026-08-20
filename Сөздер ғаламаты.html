@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сөздер ғаламаты - Ғарыштық академия</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #0B1F3A; color: white; overflow-x: hidden; }
+        
+        /* Ғарыштық фон эффектісі */
+        .space-bg {
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                              radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            background-position: 0 0, 40px 60px;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .word-card { cursor: grab; touch-action: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .word-card:active { cursor: grabbing; transform: scale(1.05); }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen p-4 space-bg">
+
+    <header class="max-w-lg mx-auto text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-blue-400 mb-2 tracking-tight">сөздер ғаламаты</h1>
+        <p class="text-blue-200 text-sm opacity-80">Тапсырманы орындау үшін сөздерді дұрыс санатқа орналастыр!</p>
+        
+        <div id="progress" class="mt-6 bg-blue-900/50 rounded-full py-2 px-6 inline-block font-semibold border border-blue-500/30 neon-glow">
+            Бастауға дайынсыз ба?
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="drop-zone glass rounded-2xl p-4 min-h-[220px] flex flex-col items-center border-t-4 border-blue-500/50" data-category="birikken">
+            <h2 class="text-xs font-bold text-blue-300 mb-3 text-center uppercase tracking-wider">Біріккен не қос сөздер</h2>
+            <div class="zone-content w-full h-full flex flex-wrap gap-2 justify-center content-start"></div>
+        </div>
+
+        <div class="drop-zone glass rounded-2xl p-4 min-h-[220px] flex flex-col items-center border-t-4 border-purple-500/50" data-category="buyn">
+            <h2 class="text-xs font-bold text-purple-300 mb-3 text-center uppercase tracking-wider">Буын талғамайтын қосымшалар</h2>
+            <div class="zone-content w-full h-full flex flex-wrap gap-2 justify-center content-start"></div>
+        </div>
+
+        <div class="drop-zone glass rounded-2xl p-4 min-h-[220px] flex flex-col items-center border-t-4 border-pink-500/50" data-category="basqa">
+            <h2 class="text-xs font-bold text-pink-300 mb-3 text-center uppercase tracking-wider">Басқа тілден енген</h2>
+            <div class="zone-content w-full h-full flex flex-wrap gap-2 justify-center content-start"></div>
+        </div>
+    </main>
+
+    <section class="max-w-4xl mx-auto glass rounded-2xl p-6">
+        <div id="word-bank" class="flex flex-wrap gap-3 justify-center"></div>
+    </section>
+
+    <div class="max-w-4xl mx-auto mt-8 text-center">
+        <button onclick="resetGame()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 border border-blue-400">
+            Қайта бастау
+        </button>
+        <p class="mt-6 text-blue-500/50 text-xs font-light">Авторы: umittoibaeva</p>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+            }
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        const wordsData = [
+            { id: 1, text: "Аяқкиім", cat: "birikken" },
+            { id: 2, text: "әсемпаз", cat: "buyn" },
+            { id: 3, text: "сәнқұмар", cat: "birikken" }, // Updated: Now in birikken
+            { id: 4, text: "мұғалім", cat: "basqa" },
+            { id: 5, text: "сәндік-қолданбалы", cat: "birikken" },
+            { id: 6, text: "сырткиім", cat: "birikken" },
+            { id: 7, text: "Шеберхана", cat: "buyn" }, // Updated: Now in buyn
+            { id: 8, text: "қызмет", cat: "basqa" },
+            { id: 9, text: "қадірлі", cat: "basqa" },
+            { id: 10, text: "дизайнер", cat: "basqa" },
+            { id: 11, text: "сәнқой", cat: "buyn" },
+            { id: 12, text: "ұсақ-түйек", cat: "birikken" },
+            { id: 13, text: "сән-салтанат", cat: "birikken" }
+        ];
+
+        let state = { placed: 0, total: wordsData.length };
+        const wordBank = document.getElementById('word-bank');
+        const progressEl = document.getElementById('progress');
+
+        function updateProgress() {
+            const remaining = state.total - state.placed;
+            if (remaining === 0) {
+                progressEl.textContent = "Тамаша! Барлығы дұрыс! 🚀";
+                progressEl.className = "mt-6 bg-green-500/20 text-green-400 border border-green-500/50 rounded-full py-2 px-6 inline-block font-semibold shadow-lg";
+            } else {
+                progressEl.textContent = `Тамаша! ${remaining} сөз қалды!`;
+            }
+        }
+
+        function createWordElement(word) {
+            const el = document.createElement('div');
+            el.className = "word-card bg-white/10 border border-white/20 px-4 py-2 rounded-xl text-white font-medium hover:bg-blue-600/30 hover:border-blue-400/50 cursor-move";
+            el.textContent = word.text;
+            el.draggable = true;
+            el.dataset.id = word.id;
+            el.dataset.cat = word.cat;
+            el.ondragstart = (e) => e.dataTransfer.setData('text/plain', word.id);
+            return el;
+        }
+
+        function initGame() {
+            wordBank.innerHTML = '';
+            state.placed = 0;
+            updateProgress();
+            wordsData.forEach(w => wordBank.appendChild(createWordElement(w)));
+            document.querySelectorAll('.zone-content').forEach(z => z.innerHTML = '');
+        }
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.ondragover = (e) => e.preventDefault();
+            zone.ondrop = (e) => {
+                e.preventDefault();
+                const wordId = e.dataTransfer.getData('text/plain');
+                const card = document.querySelector(`[data-id="${wordId}"]`);
+                
+                if (zone.dataset.category === card.dataset.cat) {
+                    zone.querySelector('.zone-content').appendChild(card);
+                    card.className = "word-card bg-green-500/20 border border-green-400 px-4 py-2 rounded-lg text-green-100 font-medium animate-pulse";
+                    state.placed++;
+                    playSound('success');
+                    updateProgress();
+                } else {
+                    card.classList.add('animate-shake');
+                    setTimeout(() => card.classList.remove('animate-shake'), 300);
+                    playSound('error');
+                }
+            };
+        });
+
+        function resetGame() {
+            initGame();
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

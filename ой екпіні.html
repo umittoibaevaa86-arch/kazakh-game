@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Диктор бол!</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#091540,#3b1c71);color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden}
+#bg:before,#bg:after{content:"";position:fixed;border-radius:50%;filter:blur(80px);opacity:.25}
+#bg:before{width:300px;height:300px;background:#0ff;left:-50px;top:-50px}
+#bg:after{width:350px;height:350px;background:#f0f;right:-50px;bottom:-50px}
+
+.mic{
+font-size:90px;
+margin:10px auto 20px;
+width:140px;height:140px;
+display:flex;align-items:center;justify-content:center;
+border-radius:50%;
+background:rgba(255,255,255,.12);
+border:2px solid rgba(0,255,255,.6);
+box-shadow:0 0 20px #00e5ff,0 0 45px #00bcd4;
+animation:pulseMic 2s ease-in-out infinite;
+}
+.mic::before{
+content:"";
+position:absolute;
+width:140px;height:140px;
+border-radius:50%;
+border:2px solid rgba(0,255,255,.45);
+animation:ring 2s linear infinite;
+}
+@keyframes pulseMic{
+0%,100%{transform:scale(1);box-shadow:0 0 20px #00e5ff,0 0 45px #00bcd4;}
+50%{transform:scale(1.12);box-shadow:0 0 35px #00ffff,0 0 80px #00ffff;}
+}
+@keyframes ring{
+0%{transform:scale(1);opacity:.7;}
+100%{transform:scale(1.6);opacity:0;}
+}
+
+.card{width:900px;max-width:92vw;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:28px;text-align:center;box-shadow:0 0 30px #0006}
+h1{margin:0;color:#7df9ff;text-shadow:0 0 15px #0ff}
+.progress{height:12px;background:#334;border-radius:20px;overflow:hidden;margin:12px 0}
+.bar{height:100%;background:#3ef}
+button{padding:14px 28px;margin:10px;border:none;border-radius:14px;background:#00bcd4;color:#fff;font-size:20px;cursor:pointer}
+button:hover{transform:scale(1.05)}
+#author{position:fixed;bottom:10px;width:100%;text-align:center;color:#ddd}
+.hidden{display:none}
+#task{font-size:28px;color:#ffd54f}
+#sent{font-size:38px;margin:25px 0}
+#exp{font-size:24px}
+</style>
+</head>
+<body><div id="bg"></div>
+<div class="card">
+<div id="start">
+<div class="mic">🎤</div><h1>🎙 ДИКТОР БОЛ!</h1>
+<h2>Телестудияға қош келдің!</h2>
+<p>Берілген сөзге немесе сөз тіркесіне ой екпінін түсіріп оқы. «Оқыдым» батырмасын басқаннан кейін түсіндірме көрсетіледі.</p>
+<button onclick="begin()">🟢 ОЙЫНДЫ БАСТАУ</button>
+</div>
+
+<div id="game" class="hidden">
+<h1>🎙 ДИКТОР БОЛ</h1>
+<div id="count"></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="task"></div>
+<div id="sent"></div>
+<div id="exp" class="hidden"></div>
+<button id="readBtn" onclick="showExp()">🎤 ОҚЫДЫМ</button>
+<button id="nextBtn" class="hidden" onclick="nextQ()">➡️ КЕЛЕСІ</button>
+</div>
+
+<div id="end" class="hidden">
+<h1>🏆 ҚҰТТЫҚТАЙМЫЗ!</h1>
+<h2>🎉 Сен барлық тапсырманы орындадың!</h2>
+<p>🎙 Нағыз диктор сияқты ой екпінін дұрыс қойып оқыдың!</p>
+<p><b>Есте сақта!</b><br>Ой екпіні – сөйлемдегі маңызды сөзді немесе сөз тіркесін ерекше дауыс ырғағымен бөліп айту.</p>
+<button onclick="restart()">🔄 Қайта ойнау</button>
+</div>
+</div>
+<div id="author">Авторы: <b>umittoibaeva</b></div>
+<script>
+const data=[
+["«Қазақ халқы» тіркесіне ой екпінін түсіріп оқы.","Қазақ халқы қонақты әрдайым құрметпен қарсы алады.","Бұл сөйлемде басқа халық емес, Қазақ халқының қонақжайлығы ерекше көрсетіледі."],
+["«Сыйлайды» сөзіне ой екпінін түсіріп оқы.","Әдепті бала үлкендерді әрдайым сыйлайды.","Басты назар әрекетке аударылады."],
+["«Батасы» сөзіне ой екпінін түсіріп оқы.","Ақсақалдың батасы әр шаңыраққа береке әкеледі.","Берекенің бастауы ретінде бата ерекше көрсетіледі."],
+["«Үйренуі керек» тіркесіне ой екпінін түсіріп оқы.","Жас ұрпақ домбыраны құрметтеп үйренуі керек.","Негізгі ой – домбыраны құрметтеп үйренуі керек."],
+["«Наурызда» сөзіне ой екпінін түсіріп оқы.","Наурызда ауыл адамдары бір-біріне ақ тілек айтады.","Оқиға дәл Наурызда болатыны ерекше айтылған."],
+["«Ана тілін» тіркесіне ой екпінін түсіріп оқы.","Әр азамат ана тілін құрметтеуі керек.","Ең маңызды құндылық – ана тілі."],
+["«Мақтанышпен» сөзіне ой екпінін түсіріп оқы.","Мерекеде жастар ұлттық киімді мақтанышпен киеді.","Ұлттық киімді мақтанышпен кию ерекшеленеді."],
+["«Ең үлкен байлық» тіркесіне ой екпінін түсіріп оқы.","Қазақ халқы бірлікті ең үлкен байлық деп бағалайды.","Бірлік – ең үлкен байлық."],
+["«Қамқорлық пен құрмет» тіркесіне ой екпінін түсіріп оқы.","Қазақ дәстүрінде кіші үлкенге қамқорлық пен құрмет көрсетеді.","Үлкенге қамқорлық пен құрмет көрсету ерекшеленеді."],
+["«Ұлттық мұраны» тіркесіне ой екпінін түсіріп оқы.","Біз ұлттық мұраны келер ұрпаққа аманат етуіміз керек.","Ұлттық мұраны сақтау қажеттігі ерекше айтылған."]
+];
+let i=0;
+function begin(){start.classList.add('hidden');game.classList.remove('hidden');load();}
+function load(){
+count.textContent=(i+1)+" / "+data.length;
+bar.style.width=((i+1)/data.length*100)+"%";
+task.innerHTML="<h2>📢 Тапсырма</h2>"+data[i][0];
+sent.innerHTML="<h2>Сөйлем</h2><div>"+data[i][1]+"</div>";
+exp.classList.add("hidden");nextBtn.classList.add("hidden");readBtn.classList.remove("hidden");
+}
+function showExp(){beep();exp.innerHTML="<h2>💡 Түсіндірме</h2>"+data[i][2];exp.classList.remove("hidden");nextBtn.classList.remove("hidden");readBtn.classList.add("hidden");}
+function nextQ(){i++; if(i>=data.length){game.classList.add("hidden");end.classList.remove("hidden");fire();} else load();}
+</script>
+
+<canvas id="fx" style="position:fixed;left:0;top:0;pointer-events:none"></canvas>
+<script>
+const ac=new (window.AudioContext||window.webkitAudioContext)();
+function beep(){
+ const o=ac.createOscillator(),g=ac.createGain();
+ o.frequency.value=880;o.connect(g);g.connect(ac.destination);
+ g.gain.value=.05;o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.15);o.stop(ac.currentTime+.15);
+}
+function restart(){i=0;end.classList.add("hidden");start.classList.remove("hidden");}
+const c=document.getElementById('fx'),x=c.getContext('2d');function rs(){c.width=innerWidth;c.height=innerHeight}rs();onresize=rs;
+let pts=[];
+function fire(){for(let k=0;k<180;k++)pts.push({x:c.width/2,y:c.height/2,vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,l:80+Math.random()*40});}
+function anim(){x.clearRect(0,0,c.width,c.height);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.l--;x.fillStyle=`hsl(${p.l*4},100%,60%)`;x.fillRect(p.x,p.y,3,3)});pts=pts.filter(p=>p.l>0);requestAnimationFrame(anim)}anim();
+</script>
+</body></html>
+
+

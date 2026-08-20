@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дауысты дыбыстар зертханасы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { background-color: #F8FAFC; font-family: 'Nunito', sans-serif; color: #1E293B; }
+        .card { background: white; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #E2E8F0; }
+        .drag-item { cursor: grab; transition: all 0.3s; }
+        .drag-item:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); border: 2px solid #3B82F6; }
+        .drop-zone { border: 3px dashed #CBD5E1; transition: all 0.3s; min-height: 100px; border-radius: 16px; background: #F1F5F9; }
+        .drop-zone.hover { border-color: #3B82F6; background: #EFF6FF; }
+        .success-flash { animation: flash 0.6s; border-color: #22C55E !important; box-shadow: 0 0 10px #22C55E; }
+        @keyframes flash { 0% { background: #DCFCE7; } 100% { background: #F1F5F9; } }
+        .shake { animation: shake 0.4s; border-color: #EF4444 !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div id="particles-js" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;"></div>
+    <div class="max-w-4xl mx-auto">
+        <!-- Оқу блогы -->
+        <section class="card p-8 mb-8 border-t-4 border-blue-500">
+            <h2 class="text-2xl font-black text-blue-600 mb-2">Сабақ тақырыбы: Қазақ тіліндегі дауысты дыбыстар</h2>
+            <div class="text-xl leading-relaxed text-slate-700 space-y-4">
+                <p>Ана тілі сол тілде сөйлейтін халықпен бірге өмір сүреді және сол халықтың өкілдері үшін қарым-қатынас құралы ретінде қызмет етеді. Тіл ана тілі атануы үшін ол күнделікті өмірде ұдайы қолданыста болуы тиіс.</p>
+                <p>Тілдің ең негізгі, яғни бірінші қызметі – адамдардың бірі-бірімен сөйлесуі. Екінші қызметі – қоршаған орта жөніндегі өз ойларын тіл арқылы жеткізуі. Үшінші қызметі – адам өзінің көзқарасын, күйініші мен сүйінішін білдіруі.</p>
+            </div>
+            <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200 font-bold text-blue-800 flex justify-between">
+                <span>Тапсырма: Әріптерді өз категорияларына орналастырыңыз.</span>
+                <span>Ұпай: <span id="xp-display">0</span></span>
+            </div>
+            <div class="mt-4 text-center">
+                <button onclick="restartGame()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all shadow-lg hover:scale-105 active:scale-95">
+                    Ойынды қайта бастау
+                </button>
+            </div>
+        </section>
+
+        <!-- Ойын аймағы -->
+        <div id="vowel-container" class="flex flex-wrap gap-4 justify-center mb-10 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-а" ondragstart="drag(event)">А</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-ә" ondragstart="drag(event)">Ә</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-о" ondragstart="drag(event)">О</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-ө" ondragstart="drag(event)">Ө</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-ұ" ondragstart="drag(event)">Ұ</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-ү" ondragstart="drag(event)">Ү</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-ы" ondragstart="drag(event)">Ы</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-і" ondragstart="drag(event)">І</div>
+            <div class="drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md" draggable="true" id="v-е" ondragstart="drag(event)">Е</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card p-5 border-blue-200"><h3 class="font-bold text-center text-blue-600 mb-4">Тілдің қатысы</h3>
+            <div class="grid grid-cols-2 gap-2"><div class="drop-zone p-2 flex flex-col items-center justify-center" data-cat="жуан" ondrop="drop(event)" ondragover="allowDrop(event)">Жуан</div><div class="drop-zone p-2 flex flex-col items-center justify-center" data-cat="жіңішке" ondrop="drop(event)" ondragover="allowDrop(event)">Жіңішке</div></div></div>
+            <div class="card p-5 border-purple-200"><h3 class="font-bold text-center text-purple-600 mb-4">Жақтың қатысы</h3>
+            <div class="grid grid-cols-2 gap-2"><div class="drop-zone p-2 flex flex-col items-center justify-center" data-cat="ашық" ondrop="drop(event)" ondragover="allowDrop(event)">Ашық</div><div class="drop-zone p-2 flex flex-col items-center justify-center" data-cat="қысаң" ondrop="drop(event)" ondragover="allowDrop(event)">Қысаң</div></div></div>
+            <div class="card p-5 border-green-200"><h3 class="font-bold text-center text-green-600 mb-4">Еріннің қатысы</h3>
+            <div class="grid grid-cols-2 gap-2"><div class="drop-zone p-2 flex flex-col items-center justify-center" data-cat="еріндік" ondrop="drop(event)" ondragover="allowDrop(event)">Еріндік</div><div class="drop-zone p-2 flex flex-col items-center justify-center" data-cat="езулік" ondrop="drop(event)" ondragover="allowDrop(event)">Езулік</div></div></div>
+        </div>
+        
+        <footer class="mt-12 text-center text-slate-400 font-medium">
+            авторы: umittoibaeva
+        </footer>
+    </div>
+
+    <script>
+        particlesJS("particles-js", { "particles": { "number": { "value": 50 }, "color": { "value": "#60A5FA" }, "opacity": { "value": 0.3 } } });
+        
+        const initialVowels = ['а', 'ә', 'о', 'ө', 'ұ', 'ү', 'ы', 'і', 'е'];
+        const vowels = { 'а': ['жуан', 'ашық', 'езулік'], 'ә': ['жіңішке', 'ашық', 'езулік'], 'о': ['жуан', 'ашық', 'еріндік'], 'ө': ['жіңішке', 'ашық', 'еріндік'], 'ұ': ['жуан', 'қысаң', 'еріндік'], 'ү': ['жіңішке', 'қысаң', 'еріндік'], 'ы': ['жуан', 'қысаң', 'езулік'], 'і': ['жіңішке', 'қысаң', 'езулік'], 'е': ['жіңішке', 'ашық', 'езулік'] };
+        
+        let stats = {};
+        let xp = 0;
+        
+        // Мотивациялық дыбыстар
+        const motivationalSounds = [
+            new Audio('https://actions.google.com/sounds/v1/ui/positive_shift.ogg'),
+            new Audio('https://actions.google.com/sounds/v1/cartoon/success_fanfare.ogg')
+        ];
+        const errorSfx = new Audio('https://actions.google.com/sounds/v1/ui/error.ogg');
+
+        function playMotivational() {
+            const sound = motivationalSounds[Math.floor(Math.random() * motivationalSounds.length)];
+            sound.currentTime = 0;
+            sound.play().catch(e => {});
+        }
+        
+        function resetStats() {
+            Object.keys(vowels).forEach(v => stats[v] = 0);
+        }
+        resetStats();
+
+        function restartGame() {
+            xp = 0;
+            document.getElementById('xp-display').innerText = xp;
+            resetStats();
+            document.querySelectorAll('.drop-zone div').forEach(el => el.remove());
+            const container = document.getElementById('vowel-container');
+            container.innerHTML = '';
+            initialVowels.forEach(char => {
+                const div = document.createElement('div');
+                div.className = 'drag-item w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md';
+                div.draggable = true;
+                div.id = 'v-' + char;
+                div.innerText = char.toUpperCase();
+                div.ondragstart = drag;
+                container.appendChild(div);
+            });
+        }
+
+        function allowDrop(e) { e.preventDefault(); }
+        function drag(e) { e.dataTransfer.setData("text", e.target.innerText.toLowerCase()); }
+
+        function drop(e) {
+            e.preventDefault();
+            const char = e.dataTransfer.getData("text");
+            const zone = e.target.closest('.drop-zone');
+            if (!zone) return;
+
+            if (vowels[char].includes(zone.getAttribute('data-cat'))) {
+                playMotivational();
+                xp += 10;
+                document.getElementById('xp-display').innerText = xp;
+                
+                zone.classList.add('success-flash');
+                const el = document.createElement('div');
+                el.className = 'bg-green-500 text-white px-2 py-1 m-1 rounded-full text-xs font-bold';
+                el.innerText = char.toUpperCase();
+                zone.appendChild(el);
+                setTimeout(() => zone.classList.remove('success-flash'), 600);
+
+                stats[char]++;
+                if (stats[char] === 3) {
+                    const elToRemove = document.getElementById('v-' + char);
+                    if(elToRemove) elToRemove.remove();
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                }
+            } else {
+                errorSfx.play().catch(e => {});
+                zone.classList.add('shake');
+                setTimeout(() => zone.classList.remove('shake'), 500);
+            }
+        }
+    </script>
+</body>
+</html>
+</html>

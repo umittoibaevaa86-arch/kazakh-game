@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ана тілі - ұлт байлығы</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Trebuchet MS', sans-serif;
+}
+
+body{
+    background: linear-gradient(135deg,#050816,#0d1b3d,#12002f);
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:30px;
+}
+
+.title{
+    text-align:center;
+    font-size:42px;
+    margin-bottom:20px;
+    color:#00ffff;
+    text-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00ffff,
+    0 0 40px #00ffff;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow{
+    from{transform:scale(1);}
+    to{transform:scale(1.03);}
+}
+
+.scoreboard{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:25px;
+    font-size:20px;
+    background:rgba(255,255,255,0.08);
+    padding:15px;
+    border-radius:20px;
+    border:2px solid #00ffff;
+    box-shadow:0 0 15px #00ffff;
+}
+
+.question-box{
+    background:rgba(255,255,255,0.08);
+    padding:25px;
+    border-radius:25px;
+    margin-bottom:25px;
+    border:2px solid #ff00ff;
+    box-shadow:0 0 20px #ff00ff;
+    animation: fadeIn 0.7s;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.question{
+    font-size:25px;
+    margin-bottom:20px;
+    color:#fff;
+}
+
+.answers button{
+    display:block;
+    width:100%;
+    margin:12px 0;
+    padding:15px;
+    font-size:18px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    background:#111;
+    color:white;
+    transition:0.3s;
+    border:2px solid #00ffff;
+    box-shadow:0 0 10px #00ffff;
+}
+
+.answers button:hover{
+    transform:scale(1.03);
+    background:#00ffff;
+    color:black;
+    box-shadow:0 0 25px #00ffff;
+}
+
+.correct{
+    background:#00ff88 !important;
+    color:black !important;
+    box-shadow:0 0 25px #00ff88 !important;
+}
+
+.wrong{
+    background:#ff004c !important;
+    color:white !important;
+    box-shadow:0 0 25px #ff004c !important;
+}
+
+#message{
+    text-align:center;
+    font-size:26px;
+    margin-top:15px;
+    min-height:50px;
+    color:#ffe600;
+    text-shadow:0 0 10px #ffe600;
+}
+
+.next-btn{
+    margin-top:20px;
+    padding:14px 35px;
+    font-size:18px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    background:#00ffff;
+    color:black;
+    display:none;
+    box-shadow:0 0 20px #00ffff;
+}
+
+.result{
+    text-align:center;
+    display:none;
+}
+
+.result h2{
+    font-size:40px;
+    margin-bottom:20px;
+    color:#00ff88;
+    text-shadow:0 0 20px #00ff88;
+}
+
+.result p{
+    font-size:25px;
+    margin:10px;
+}
+
+.restart{
+    margin-top:25px;
+    padding:15px 30px;
+    font-size:20px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    background:#ff00ff;
+    color:white;
+    box-shadow:0 0 20px #ff00ff;
+}
+
+.footer{
+    position:fixed;
+    bottom:10px;
+    width:100%;
+    text-align:center;
+    font-size:20px;
+    color:#00ffff;
+    text-shadow:
+    0 0 5px #00ffff,
+    0 0 15px #00ffff,
+    0 0 25px #00ffff;
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse{
+    from{opacity:0.7;}
+    to{opacity:1;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 class="title">🧠 «Кім жылдам?» викторинасы</h1>
+
+<div class="scoreboard">
+<div>✅ Дұрыс: <span id="correctCount">0</span></div>
+<div>❌ Қате: <span id="wrongCount">0</span></div>
+</div>
+
+<div class="question-box">
+<div class="question" id="question"></div>
+
+<div class="answers" id="answers"></div>
+
+<div id="message"></div>
+
+<button class="next-btn" id="nextBtn">Келесі сұрақ ➜</button>
+</div>
+
+<div class="result" id="result">
+<h2>🏆 Ойын аяқталды!</h2>
+<p id="finalScore"></p>
+<p id="finalMessage"></p>
+
+<button class="restart" onclick="location.reload()">
+🔄 Қайта ойнау
+</button>
+</div>
+
+</div>
+
+<div class="footer">
+✨ Авторы: umittoibaeva ✨
+</div>
+
+<script>
+
+const questions = [
+
+{
+question:"Қазақ тілі қашан мемлекеттік мәртебе алды?",
+answers:[
+{text:"1989 жылы", correct:true},
+{text:"1995 жылы", correct:false},
+{text:"2001 жылы", correct:false}
+]
+},
+
+{
+question:"Қазақ тілі қай елдердегі қазақтардың ана тілі болып саналады?",
+answers:[
+{text:"Тек Қазақстанда", correct:false},
+{text:"Қазақстанда ғана емес, басқа елдерде де", correct:true},
+{text:"Тек Түркияда", correct:false}
+]
+},
+
+{
+question:"Қазақ тілі қанша мемлекеттік мәртебесі бар тілдердің қатарына жатады?",
+answers:[
+{text:"100 тіл", correct:false},
+{text:"200 тіл", correct:true},
+{text:"500 тіл", correct:false}
+]
+},
+
+{
+question:"«Қазақ әдеби тілінің сөздігінде» қанша сөз бен тіркес енген?",
+answers:[
+{text:"50 мың", correct:false},
+{text:"80 мың", correct:false},
+{text:"150 мыңнан астам", correct:true}
+]
+},
+
+{
+question:"Мақалды жалғастыр: «Өнер алды — ...»",
+answers:[
+{text:"ақыл", correct:false},
+{text:"қызыл тіл", correct:true},
+{text:"достық", correct:false}
+]
+},
+
+{
+question:"Мақалды жалғастыр: «Тіл тас жарады, ...»",
+answers:[
+{text:"су ақпайды", correct:false},
+{text:"тас жармаса бас жарады", correct:true},
+{text:"ел қорғайды", correct:false}
+]
+},
+
+{
+question:"Мақалды жалғастыр: «Ана тілің — ...»",
+answers:[
+{text:"арың бұл", correct:true},
+{text:"досың бұл", correct:false},
+{text:"бақытың бұл", correct:false}
+]
+},
+
+{
+question:"Қазақ тілінің бай екенін не көрсетеді?",
+answers:[
+{text:"Көп сөз бен тіркестің болуы", correct:true},
+{text:"Тек әндер", correct:false},
+{text:"Тек ертегілер", correct:false}
+]
+}
+
+];
+
+const positiveMessages = [
+"🌟 Жарайсың!",
+"🔥 Керемет!",
+"🎉 Өте жақсы!",
+"💎 Тамаша жауап!",
+"🚀 Сен мықтысың!"
+];
+
+const negativeMessages = [
+"😅 Қайта ойланып көр!",
+"📚 Әлі де үйренесің!",
+"💡 Келесіде дұрыс болады!",
+"🙂 Уайымдама!",
+"⭐ Тырысып көр!"
+];
+
+let currentQuestion = 0;
+let correct = 0;
+let wrong = 0;
+
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const nextBtn = document.getElementById("nextBtn");
+const messageEl = document.getElementById("message");
+
+function playCorrectSound(){
+const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3");
+audio.play();
+}
+
+function playWrongSound(){
+const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3");
+audio.play();
+}
+
+function showQuestion(){
+
+nextBtn.style.display="none";
+messageEl.innerHTML="";
+
+let q = questions[currentQuestion];
+
+questionEl.innerHTML = q.question;
+
+answersEl.innerHTML="";
+
+q.answers.forEach(answer =>{
+
+const button = document.createElement("button");
+button.innerHTML = answer.text;
+
+button.addEventListener("click", ()=>selectAnswer(button,answer.correct));
+
+answersEl.appendChild(button);
+
+});
+
+}
+
+function selectAnswer(button,correctAnswer){
+
+const buttons = answersEl.querySelectorAll("button");
+
+buttons.forEach(btn => btn.disabled=true);
+
+if(correctAnswer){
+
+button.classList.add("correct");
+
+correct++;
+document.getElementById("correctCount").innerText=correct;
+
+playCorrectSound();
+
+messageEl.innerHTML=
+positiveMessages[Math.floor(Math.random()*positiveMessages.length)];
+
+}else{
+
+button.classList.add("wrong");
+
+wrong++;
+document.getElementById("wrongCount").innerText=wrong;
+
+playWrongSound();
+
+messageEl.innerHTML=
+negativeMessages[Math.floor(Math.random()*negativeMessages.length)];
+
+}
+
+nextBtn.style.display="inline-block";
+
+}
+
+nextBtn.addEventListener("click", ()=>{
+
+currentQuestion++;
+
+if(currentQuestion < questions.length){
+
+showQuestion();
+
+}else{
+
+showResult();
+
+}
+
+});
+
+function showResult(){
+
+document.querySelector(".question-box").style.display="none";
+
+document.getElementById("result").style.display="block";
+
+document.getElementById("finalScore").innerHTML=
+`✅ Дұрыс жауап: ${correct} <br> ❌ Қате жауап: ${wrong}`;
+
+let text="";
+
+if(correct >=7){
+text="🏆 Сен тіл жанашырысың!";
+}
+else if(correct >=5){
+text="🌟 Жақсы нәтиже!";
+}
+else{
+text="📚 Көбірек дайындал!";
+}
+
+document.getElementById("finalMessage").innerHTML=text;
+
+}
+
+showQuestion();
+
+</script>
+
+</body>
+</html>

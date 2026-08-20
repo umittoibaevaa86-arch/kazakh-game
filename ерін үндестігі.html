@@ -1,0 +1,218 @@
+
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Еріндіктер саяхаты - Ғарыштық Академия</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0B1F4A;
+            --card-color: rgba(20, 47, 107, 0.6);
+            --neon-blue: #4CC9F0;
+            --neon-purple: #8B5CF6;
+            --gold: #FFD166;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #142F6B, #0B1F4A);
+            font-family: 'Inter', sans-serif;
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        .neon-glow {
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+        }
+
+        .neon-border {
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
+        }
+
+        .word-card {
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4CC9F0, #8B5CF6);
+            backdrop-filter: blur(5px);
+            position: absolute;
+            pointer-events: auto; /* Ensure clickable */
+            user-select: none;
+            z-index: 10;
+        }
+
+        .word-card:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .correct-flash { animation: correctFlash 0.5s forwards; }
+        .wrong-flash { animation: wrongFlash 0.5s forwards; }
+
+        @keyframes correctFlash {
+            0% { box-shadow: 0 0 0px #22c55e; background: #22c55e; }
+            100% { box-shadow: 0 0 30px #22c55e; background: #22c55e; opacity: 0; }
+        }
+
+        @keyframes wrongFlash {
+            0% { box-shadow: 0 0 0px #ef4444; background: #ef4444; }
+            100% { box-shadow: 0 0 30px #ef4444; background: #ef4444; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+    <div class="stars"></div>
+
+    <header class="w-full max-w-4xl p-6 flex justify-between items-center z-20">
+        <div class="neon-border bg-slate-900/50 p-3 rounded-xl px-6">
+            <span class="text-yellow-400 font-bold text-lg">Уақыт:</span>
+            <span id="timer" class="text-2xl font-black text-white ml-2">30</span>
+        </div>
+        <h1 class="text-4xl font-black text-white italic tracking-tighter neon-glow">Еріндіктер саяхаты</h1>
+        <div class="neon-border bg-slate-900/50 p-3 rounded-xl px-6">
+            <span class="text-yellow-400 font-bold text-lg">Ұпай:</span>
+            <span id="score" class="text-2xl font-black text-white ml-2">0</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl mt-4 glass-card p-6 text-center z-10 mx-4">
+        <h2 class="text-xl font-bold mb-2">Ғарыштық Академияға қош келдің!</h2>
+        <p class="text-blue-200">Тапсырма: Ерін үндестігіне бағынатын сөздерді басып, кемеңді отынмен толтыр!</p>
+    </main>
+
+    <div id="game-area" class="relative w-full max-w-4xl h-[50vh] mt-8 overflow-hidden z-10"></div>
+
+    <div id="modal" class="fixed inset-0 flex items-center justify-center z-50 bg-slate-900/80 backdrop-blur-sm">
+        <div class="glass-card p-10 text-center w-80 shadow-2xl">
+            <h2 id="modal-title" class="text-3xl font-black text-white mb-6">Бастауға дайынсың ба?</h2>
+            <button id="action-btn" onclick="startGame()" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white px-8 py-4 rounded-full font-bold transition-all transform active:scale-95 text-lg w-full">
+                Ойынды бастау
+            </button>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-4 text-slate-400 font-medium">
+        Авторы: umittoibaeva
+    </footer>
+
+    <script>
+        const wordsBank = [
+            { w: "Көрік", v: true }, { w: "Жүрек", v: true }, { w: "Өрік", v: true },
+            { w: "Көгершін", v: true }, { w: "Түлкі", v: true }, { w: "Күлкі", v: true },
+            { w: "Бөбек", v: true }, { w: "Өнер", v: true }, { w: "Өзен", v: true },
+            { w: "Күміс", v: true }, { w: "Түйе", v: true }, { w: "Көлшік", v: true },
+            { w: "Сөре", v: true }, { w: "Төбе", v: true }, { w: "Сүт", v: true },
+            { w: "Кітап", v: false }, { w: "Бала", v: false }, { w: "Қалам", v: false },
+            { w: "Терезе", v: false }, { w: "Мектеп", v: false }, { w: "Дәптер", v: false },
+            { w: "Ағаш", v: false }, { w: "Тас", v: false }, { w: "Нан", v: false },
+            { w: "Алма", v: false }, { w: "Оқу", v: false }
+        ];
+
+        let score = 0;
+        let time = 30;
+        let gameActive = false;
+        let timerInterval;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function startGame() {
+            score = 0;
+            time = 30;
+            document.getElementById('score').innerText = score;
+            document.getElementById('timer').innerText = time;
+            document.getElementById('modal').style.display = 'none';
+            gameActive = true;
+            
+            spawnWord();
+            timerInterval = setInterval(() => {
+                time--;
+                document.getElementById('timer').innerText = time;
+                if (time <= 0) endGame();
+            }, 1000);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = `Ұпайыңыз: ${score}`;
+            document.getElementById('action-btn').innerText = "Қайта ойнау";
+        }
+
+        function spawnWord() {
+            if (!gameActive) return;
+
+            const area = document.getElementById('game-area');
+            const data = wordsBank[Math.floor(Math.random() * wordsBank.length)];
+            
+            const div = document.createElement('div');
+            div.className = "word-card absolute px-6 py-3 rounded-2xl text-white font-bold shadow-lg z-20 flex items-center justify-center";
+            div.innerText = data.w;
+            
+            // Random horizontal position
+            div.style.left = (Math.random() * 70 + 10) + "%";
+            div.style.top = "-50px";
+            
+            // Slower animation speed: 8 seconds
+            div.animate([
+                { transform: 'translateY(0)' },
+                { transform: 'translateY(450px)' }
+            ], { duration: 8000, easing: 'linear' });
+
+            div.onclick = (e) => {
+                e.stopPropagation(); // Stop bubbling
+                if (data.v) {
+                    score += 10;
+                    playTone(600, 'correct');
+                    div.classList.add('correct-flash');
+                } else {
+                    score = Math.max(0, score - 5);
+                    playTone(200, 'wrong');
+                    div.classList.add('wrong-flash');
+                }
+                document.getElementById('score').innerText = score;
+                setTimeout(() => div.remove(), 500);
+            };
+
+            area.appendChild(div);
+            
+            // Remove after animation ends
+            setTimeout(() => { if (div.parentNode) div.remove(); }, 8000);
+            
+            // Spawn next word slower: every 1.5 seconds
+            if (gameActive) setTimeout(spawnWord, 1500);
+        }
+    </script>
+</body>
+</html>

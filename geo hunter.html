@@ -1,0 +1,170 @@
+
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Hunter: Қазақстанды зертте!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(135deg, #e0f2fe, #bae6fd); overflow: hidden; margin: 0; font-family: 'Arial', sans-serif; color: #0f172a; }
+        .card { 
+            position: absolute; padding: 10px 20px; background: rgba(255, 255, 255, 0.9); 
+            border: 2px solid #0ea5e9; border-radius: 12px; cursor: pointer; user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.2s; z-index: 100; font-weight: bold;
+        }
+        .card:hover { transform: scale(1.05); }
+        .map-container { filter: brightness(1.1) drop-shadow(0 0 10px rgba(56, 189, 248, 0.3)); }
+        .map-point { fill: transparent; stroke: transparent; transition: all 0.5s; stroke-width: 2; }
+        .map-point.active { fill: #22c55e; stroke: #fff; stroke-width: 2; filter: drop-shadow(0 0 5px #22c55e); }
+        .glass-box { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border: 2px solid #0ea5e9; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center">
+
+    <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center z-50 bg-sky-50">
+        <h1 class="text-6xl font-black text-sky-600 mb-2">GEO HUNTER</h1>
+        <p class="text-sky-800 mb-8 font-medium">Авторы: umittoibaeva</p>
+        <button id="start-btn" class="px-12 py-4 bg-sky-600 hover:bg-sky-500 text-white rounded-full text-2xl font-bold shadow-xl transition">БАСТАУ</button>
+    </div>
+
+    <div id="game-container" class="hidden w-full h-full flex flex-col items-center relative">
+        <div class="mt-4 w-11/12 max-w-2xl glass-box p-4 rounded-2xl text-center z-40">
+            <h1 class="text-md font-bold text-sky-900">Тапсырма: Екі не үш түбірден біріккен географиялық атаулардың сыңарын дұрыс тауып орналастыр</h1>
+        </div>
+
+        <div id="prompt-box" class="mt-4 glass-box px-8 py-2 rounded-xl z-40">
+            <span id="prompt-text" class="text-3xl font-black text-sky-600">...</span>
+        </div>
+
+        <img src="https://i.pinimg.com/1200x/f4/93/7a/f4937a6aec9df99259f0ace8fdbcf329.jpg" class="map-container absolute mt-20 w-full max-w-4xl object-contain opacity-90" alt="Қазақстан картасы">
+        
+        <svg class="absolute mt-20 w-full max-w-4xl h-full pointer-events-none" viewBox="0 0 800 400">
+            <!-- Координаталар картаға сәйкестендірілді -->
+            <circle id="p0" class="map-point" cx="370" cy="180" r="8"/> <!-- Жезқазған -->
+            <circle id="p1" class="map-point" cx="375" cy="335" r="8"/> <!-- Сарыағаш -->
+            <circle id="p2" class="map-point" cx="190" cy="160" r="8"/> <!-- Ақтөбе -->
+            <circle id="p3" class="map-point" cx="540" cy="130" r="8"/> <!-- Екібастұз -->
+            <circle id="p4" class="map-point" cx="320" cy="270" r="8"/> <!-- Қызылорда -->
+            <circle id="p5" class="map-point" cx="390" cy="315" r="8"/> <!-- Түлкібас -->
+            <circle id="p6" class="map-point" cx="340" cy="285" r="8"/> <!-- Жаңақорған -->
+            <circle id="p7" class="map-point" cx="530" cy="260" r="8"/> <!-- Талдықорған -->
+            <circle id="p8" class="map-point" cx="440" cy="110" r="8"/> <!-- Көкшетау -->
+            <circle id="p9" class="map-point" cx="520" cy="300" r="8"/> <!-- Алатау -->
+            <circle id="p10" class="map-point" cx="440" cy="180" r="8"/> <!-- Сарыарқа -->
+            <circle id="p11" class="map-point" cx="380" cy="310" r="8"/> <!-- Әулиеата -->
+            <circle id="p12" class="map-point" cx="420" cy="170" r="8"/> <!-- Сарыжайлау -->
+            <circle id="p13" class="map-point" cx="370" cy="305" r="8"/> <!-- Қаратау -->
+            <circle id="p14" class="map-point" cx="380" cy="320" r="8"/> <!-- Алғабас -->
+        </svg>
+
+        <div id="card-area" class="absolute inset-0 z-30"></div>
+
+        <div id="feedback" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-sky-900/20 backdrop-blur-sm">
+            <div class="glass-box p-8 text-center rounded-3xl">
+                <h2 id="full-word" class="text-5xl font-black text-sky-700"></h2>
+                <p id="desc" class="text-lg text-sky-900 mt-2"></p>
+            </div>
+        </div>
+
+        <button id="restart-btn" class="hidden absolute bottom-10 px-10 py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-full text-lg font-bold shadow-xl z-50 transition">Ойынды қайта бастау</button>
+    </div>
+
+    <script>
+        const questions = [
+            { id: 0, parts:["Жез","қазған"], answer:"Жезқазған", region:"Ұлытау облысы", location:"Орталық Қазақстан" },
+            { id: 1, parts:["Сары","ағаш"], answer:"Сарыағаш", region:"Түркістан облысы", location:"Оңтүстік Қазақстан" },
+            { id: 2, parts:["Ақ","төбе"], answer:"Ақтөбе", region:"Ақтөбе облысы", location:"Батыс Қазақстан" },
+            { id: 3, parts:["Екі","бастұз"], answer:"Екібастұз", region:"Павлодар облысы", location:"Солтүстік-шығыс Қазақстан" },
+            { id: 4, parts:["Қызыл","орда"], answer:"Қызылорда", region:"Қызылорда облысы", location:"Оңтүстік-батыс Қазақстан" },
+            { id: 5, parts:["Түлкі","бас"], answer:"Түлкібас", region:"Түркістан облысы", location:"Оңтүстік Қазақстан" },
+            { id: 6, parts:["Жаңа","қорған"], answer:"Жаңақорған", region:"Қызылорда облысы", location:"Оңтүстік Қазақстан" },
+            { id: 7, parts:["Талды","қорған"], answer:"Талдықорған", region:"Жетісу облысы", location:"Оңтүстік-шығыс Қазақстан" },
+            { id: 8, parts:["Көкше","тау"], answer:"Көкшетау", region:"Ақмола облысы", location:"Солтүстік Қазақстан" },
+            { id: 9, parts:["Ала","тау"], answer:"Алатау", region:"Тау жүйесі", location:"Алматы және Жетісу" },
+            { id: 10, parts:["Сары","арқа"], answer:"Сарыарқа", region:"Қазақтың ұсақ шоқылары", location:"Орталық Қазақстан" },
+            { id: 11, parts:["Әулие","ата"], answer:"Әулиеата", region:"Жамбыл облысы", location:"Тараз" },
+            { id: 12, parts:["Сары","жайлау"], answer:"Сарыжайлау", region:"Қарағанды облысы", location:"Орталық Қазақстан" },
+            { id: 13, parts:["Қара","тау"], answer:"Қаратау", region:"Түркістан және Жамбыл", location:"Оңтүстік Қазақстан" },
+            { id: 14, parts:["Алға","бас"], answer:"Алғабас", region:"Түркістан облысы", location:"Оңтүстік Қазақстан" }
+        ];
+
+        let state = { idx: 0 };
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(freq) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        }
+
+        function nextLevel() {
+            if(state.idx >= questions.length) {
+                document.getElementById('prompt-text').textContent = "ЖЕҢІС!";
+                document.getElementById('restart-btn').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('prompt-text').textContent = questions[state.idx].parts[0] + " + ...";
+        }
+
+        function spawnCards() {
+            const cardArea = document.getElementById('card-area');
+            cardArea.innerHTML = '';
+            questions.forEach((q) => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.textContent = q.parts[1];
+                el.style.left = (Math.random() * (window.innerWidth - 200) + 50) + 'px';
+                el.style.top = (Math.random() * (window.innerHeight - 300) + 150) + 'px';
+                el.vx = (Math.random() - 0.5) * 2;
+                el.vy = (Math.random() - 0.5) * 2;
+                el.onclick = () => checkMatch(el, q);
+                cardArea.appendChild(el);
+            });
+        }
+
+        function checkMatch(el, q) {
+            if (q.id === questions[state.idx].id) {
+                playSound(600);
+                el.remove();
+                const feedback = document.getElementById('feedback');
+                document.getElementById('full-word').textContent = q.answer;
+                document.getElementById('desc').textContent = q.desc || (q.region + ", " + q.location);
+                feedback.classList.remove('hidden');
+                document.getElementById('p'+q.id).classList.add('active');
+                setTimeout(() => {
+                    feedback.classList.add('hidden');
+                    state.idx++;
+                    nextLevel();
+                }, 1500);
+            } else {
+                playSound(200);
+            }
+        }
+
+        function move() {
+            document.querySelectorAll('.card').forEach(c => {
+                let x = parseFloat(c.style.left);
+                let y = parseFloat(c.style.top);
+                x += c.vx; y += c.vy;
+                if(x < 0 || x > window.innerWidth - 100) c.vx *= -1;
+                if(y < 150 || y > window.innerHeight - 50) c.vy *= -1;
+                c.style.left = x + 'px'; c.style.top = y + 'px';
+            });
+            requestAnimationFrame(move);
+        }
+
+        document.getElementById('start-btn').onclick = () => {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            spawnCards();
+            nextLevel();
+            move();
+        };
+
+        document.getElementById('restart-btn').onclick = () => location.reload();
+    </script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Синонимдер мен Антонимдер - Неон Тест Ойыны</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #080017;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Неон тақырыбы */
+        h1 {
+            font-size: 2.2rem;
+            color: #ff007f;
+            text-shadow: 0 0 5px #ff007f, 0 0 15px #ff007f, 0 0 30px #ff007f;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #00f3ff;
+            text-shadow: 0 0 8px #00f3ff;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 600px;
+            font-size: 1.2rem;
+            color: #ffe600;
+            text-shadow: 0 0 8px #ffe600;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 230, 0, 0.3);
+        }
+
+        /* Басқару батырмалары */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: transparent;
+            color: #00f3ff;
+            border: 2px solid #00f3ff;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #00f3ff;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: #00f3ff;
+            color: #080017;
+            box-shadow: 0 0 20px #00f3ff, 0 0 40px #00f3ff;
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            border-color: #444;
+            color: #444;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Ойын/Тест карточкасы */
+        .quiz-container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(20, 5, 45, 0.8);
+            border: 2px solid #bf00ff;
+            box-shadow: 0 0 20px #bf00ff, inset 0 0 15px rgba(191, 0, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .question-box {
+            font-size: 1.3rem;
+            color: #fff;
+            text-shadow: 0 0 5px #fff;
+            text-align: center;
+            line-height: 1.5;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(13, 2, 33, 0.9);
+            border: 2px solid #00f3ff;
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 0 0 8px #00f3ff;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 15px #00f3ff;
+            transform: translateX(5px);
+        }
+
+        .option-btn.correct {
+            border-color: #00ff66 !important;
+            background: rgba(0, 255, 102, 0.25) !important;
+            box-shadow: 0 0 20px #00ff66 !important;
+            color: #fff;
+        }
+
+        .option-btn.wrong {
+            border-color: #ff0055 !important;
+            background: rgba(255, 0, 85, 0.25) !important;
+            box-shadow: 0 0 20px #ff0055 !important;
+            color: #fff;
+        }
+
+        /* Прогресс бар */
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00f3ff, #ff007f);
+            box-shadow: 0 0 10px #00f3ff;
+            transition: width 0.3s ease;
+        }
+
+        /* Нәтиже экраны */
+        .result-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            color: #00ff66;
+            text-shadow: 0 0 15px #00ff66;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            color: #ffe600;
+            text-shadow: 0 0 10px #ffe600;
+        }
+
+        /* Автор жазуы */
+        footer {
+            margin-top: auto;
+            padding: 15px;
+            font-size: 1.2rem;
+            color: #00f3ff;
+            text-shadow: 0 0 5px #00f3ff, 0 0 10px #00f3ff;
+            letter-spacing: 1.5px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.7rem;
+            }
+            .question-box {
+                font-size: 1.1rem;
+            }
+            .option-btn {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Синоним мен Антоним</h1>
+    <div class="subtitle">Интерактивті Неон Тесті</div>
+
+    <div class="score-board">
+        <div>Сұрақ: <span id="currentQ">0</span> / 10</div>
+        <div>Ұпай: <span id="score">0</span></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="startBtn" onclick="startGame()">Ойнау</button>
+        <button class="btn" id="restartBtn" onclick="restartGame()" disabled>Қайта ойнау</button>
+    </div>
+
+    <!-- Тест экраны -->
+    <div class="quiz-container" id="quizContainer">
+        <div class="question-box" id="questionText">
+            Ойынды бастау үшін «ОЙНАУ» батырмасын басыңыз!
+        </div>
+
+        <div class="options-grid" id="optionsGrid">
+            <!-- Жауап нұсқалары JS арқылы жүктеледі -->
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Нәтиже блогы -->
+        <div class="result-screen" id="resultScreen">
+            <div class="result-title" id="resultTitle">Керемет!</div>
+            <div class="result-score" id="resultScore">Сіз 100 ұпай жинадыңыз!</div>
+            <button class="btn" onclick="restartGame()">Тағы да байқап көр</button>
+        </div>
+    </div>
+
+    <footer>
+        Автор: Ү.Тойбаева
+    </footer>
+
+    <script>
+        // 10 Тест сұрақтары
+        const quizQuestions = [
+            {
+                question: "«Сұлу» сөзінің СИНОНИМІН табыңыз:",
+                options: ["Әдемі", "Үлкен", "Ұсқынсыз", "Биік"],
+                answer: 0
+            },
+            {
+                question: "«Биік» сөзінің АНТОНИМІН табыңыз:",
+                options: ["Алыс", "Төмен", "Терең", "Ұзын"],
+                answer: 1
+            },
+            {
+                question: "«Батыр» сөзіне СИНОНИМ болатын сөзді көрсетіңіз:",
+                options: ["Қорқақ", "Ақылды", "Ер жүрек", "Сәбіз"],
+                answer: 2
+            },
+            {
+                question: "«Тәтті» сөзінің АНТОНИМІН табыңыз:",
+                options: ["Дәмді", "Ащы", "Шекер", "Жұмсақ"],
+                answer: 1
+            },
+            {
+                question: "«Аз» сөзінің АНТОНИМІН табыңыз:",
+                options: ["Көп", "Кішкентай", "Молшылық", "Сирек"],
+                answer: 0
+            },
+            {
+                question: "«Аяз» сөзінің СИНОНИМІН табыңыз:",
+                options: ["Жылы", "Салқын", "Суық", "Ыстық"],
+                answer: 2
+            },
+            {
+                question: "«Дос» сөзінің АНТОНИМІН табыңыз:",
+                options: ["Жолдас", "Құрдас", "Душпан", "Аға"],
+                answer: 2
+            },
+            {
+                question: "«Жылдам» сөзінің СИНОНИМІН табыңыз:",
+                options: ["Шапшаң", "Баяу", "Ақырын", "Ауыр"],
+                answer: 0
+            },
+            {
+                question: "«Жарық» сөзінің АНТОНИМІН табыңыз:",
+                options: ["Сәуле", "Қараңғы", "Күн", "Түн"],
+                answer: 1
+            },
+            {
+                question: "«Үлкен» сөзінің СИНОНИМІН табыңыз:",
+                options: ["Дәу", "Кіші", "Аласа", "Жіңішке"],
+                answer: 0
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let gameActive = false;
+        let canAnswer = true;
+
+        // Web Audio API дыбыстары
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); // G5
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.12);
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.24);
+                osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.36);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.55);
+            }
+        }
+
+        // Ойынды бастау
+        function startGame() {
+            playSound('click');
+            gameActive = true;
+            currentQuestionIndex = 0;
+            score = 0;
+
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('restartBtn').disabled = false;
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('optionsGrid').style.display = 'grid';
+
+            updateScore();
+            showQuestion();
+        }
+
+        // Сұрақты көрсету
+        function showQuestion() {
+            canAnswer = true;
+            const q = quizQuestions[currentQuestionIndex];
+
+            document.getElementById('currentQ').innerText = currentQuestionIndex + 1;
+            document.getElementById('questionText').innerText = q.question;
+
+            // Прогресс бар
+            const progressPercent = ((currentQuestionIndex) / quizQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = `${String.fromCharCode(65 + index)}) ${opt}`;
+                btn.onclick = () => selectAnswer(btn, index);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        // Жауапты таңдау
+        function selectAnswer(selectedBtn, selectedIndex) {
+            if (!canAnswer || !gameActive) return;
+            canAnswer = false;
+
+            const q = quizQuestions[currentQuestionIndex];
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            if (selectedIndex === q.answer) {
+                playSound('correct');
+                selectedBtn.classList.add('correct');
+                score += 10;
+                updateScore();
+            } else {
+                playSound('wrong');
+                selectedBtn.classList.add('wrong');
+                // Дұрысын да көрсету
+                allBtns[q.answer].classList.add('correct');
+            }
+
+            // Келесі сұраққа өту кідірісі
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizQuestions.length) {
+                    showQuestion();
+                } else {
+                    finishGame();
+                }
+            }, 1200);
+        }
+
+        // Ұпайды жаңарту
+        function updateScore() {
+            document.getElementById('score').innerText = score;
+        }
+
+        // Ойынды аяқтау
+        function finishGame() {
+            gameActive = false;
+            playSound('win');
+
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('questionText').innerText = "Тест аяқталды!";
+            document.getElementById('optionsGrid').style.display = 'none';
+
+            const resultScreen = document.getElementById('resultScreen');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultScore = document.getElementById('resultScore');
+
+            if (score >= 80) {
+                resultTitle.innerText = "Өте керемет! 🎉";
+            } else if (score >= 50) {
+                resultTitle.innerText = "Жақсы нәтиже! 👍";
+            } else {
+                resultTitle.innerText = "Тағы да жаттығу керек! 💪";
+            }
+
+            resultScore.innerText = `Сіз 100 ұпайдан ${score} ұпай жинадыңыз! (${score}% дұрыс)`;
+            resultScreen.style.display = 'flex';
+        }
+
+        // Қайта ойнау
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>

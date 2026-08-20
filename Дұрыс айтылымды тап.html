@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дұрыс айтылымды тап!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { background: radial-gradient(circle at center, #0ea5e9, #1e1b4b); min-height: 100vh; display: flex; flex-direction: column; align-items: center; font-family: 'Poppins', sans-serif; overflow: hidden; margin: 0; color: white; }
+        .header-glow { text-shadow: 0 0 15px rgba(139, 92, 246, 0.8); }
+        .game-card { background: rgba(255, 255, 255, 0.95); border-radius: 2rem; box-shadow: 0 10px 40px rgba(0,0,0,0.3); width: 95%; max-width: 450px; padding: 1.5rem; z-index: 10; color: #1e293b; }
+        .option-btn { background: #8b5cf6; color: white; padding: 1rem; border-radius: 1.2rem; font-weight: 800; border-bottom: 5px solid #5b21b6; transition: all 0.2s; width: 100%; }
+        .option-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Тақырып -->
+    <h1 class="text-3xl md:text-4xl font-black mt-6 mb-6 header-glow tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">ДҰРЫС АЙТЫЛЫМДЫ ТАП!</h1>
+
+    <div class="game-card" id="game-box">
+        <div class="flex justify-between items-center mb-3 text-sm font-bold text-blue-600">
+            <span>Ұпай: <span id="score">0</span></span>
+            <span><span id="current-q">1</span>/10</span>
+        </div>
+        <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden mb-6">
+            <div id="progress" class="bg-green-500 h-full w-[10%] transition-all duration-500"></div>
+        </div>
+        <div class="flex items-center justify-center gap-3 mb-6">
+            <span class="text-4xl">🎓</span>
+            <h2 id="question" class="text-2xl font-black"></h2>
+        </div>
+        <div id="options" class="grid gap-3"></div>
+    </div>
+
+    <button id="toggle-sound" class="mt-6 bg-white/20 px-6 py-2 rounded-full font-bold backdrop-blur hover:bg-white/30 transition">🔊 Дыбыс: Қосу</button>
+    <footer class="mt-auto py-4 text-white/40 text-xs font-bold tracking-widest">umittoibaeva</footer>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+
+        function playSound(type) {
+            if(!soundEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if(type === 'success') {
+                osc.frequency.value = 600;
+                osc.type = 'sine';
+                gain.gain.exponentialRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            } else {
+                osc.frequency.value = 150;
+                osc.type = 'sawtooth';
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            }
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        const questions = [
+            { q: "Боз жорға", a: "Божжорға", dist: ["Бозжорға", "Босжорға"] },
+            { q: "Ақ аю", a: "Ағаю", dist: ["Ақаю", "Ақ-аю"] },
+            { q: "Көк ала", a: "Көгала", dist: ["Көкала", "Көгалла"] },
+            { q: "Ақ лақ", a: "Ағлақ", dist: ["Ақлақ", "Ағ-лақ"] },
+            { q: "Көк орай", a: "Көгорай", dist: ["Көкорай", "Көгорай"] },
+            { q: "Жанпейіс", a: "Жампейіс", dist: ["Жанпейіс", "Жампейіш"] },
+            { q: "Ермағанбет", a: "Ермағамбет", dist: ["Ермағанбет", "Ермахамбет"] },
+            { q: "Тұз сал", a: "Тұссал", dist: ["Тұзсал", "Тұсау"] },
+            { q: "Жазса", a: "Жасса", dist: ["Жазса", "Жасса."] },
+            { q: "Басшы", a: "Башшы", dist: ["Басшы", "Баш-шы"] }
+        ];
+
+        let currentIdx = 0, score = 0, canAnswer = true;
+
+        function loadQuestion() {
+            if(currentIdx >= questions.length) {
+                document.getElementById('game-box').innerHTML = `<h1 class="text-2xl font-black text-blue-900">Ойын аяқталды!</h1><p class="text-xl my-4">Жиынтық ұпай: ${score}</p><button onclick="location.reload()" class="option-btn">Қайта бастау</button>`;
+                return;
+            }
+            canAnswer = true;
+            const q = questions[currentIdx];
+            document.getElementById('question').textContent = q.q;
+            document.getElementById('current-q').textContent = currentIdx + 1;
+            document.getElementById('progress').style.width = ((currentIdx + 1) / questions.length) * 100 + '%';
+            
+            const options = document.getElementById('options');
+            options.innerHTML = '';
+            Array.from(new Set([q.a, ...q.dist])).sort(() => Math.random() - 0.5).forEach(o => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = o;
+                btn.onclick = () => {
+                    if(!canAnswer) return;
+                    canAnswer = false;
+                    if(o === q.a) {
+                        score += 10;
+                        playSound('success');
+                        btn.style.background = "#22c55e";
+                        btn.style.borderColor = "#15803d";
+                        confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } });
+                        document.getElementById('score').textContent = score;
+                    } else {
+                        playSound('error');
+                        btn.classList.add('shake');
+                        btn.style.background = "#ef4444";
+                        btn.style.borderColor = "#b91c1c";
+                    }
+                    setTimeout(() => { currentIdx++; loadQuestion(); }, 1200);
+                };
+                options.appendChild(btn);
+            });
+        }
+
+        document.getElementById('toggle-sound').onclick = (e) => {
+            soundEnabled = !soundEnabled;
+            e.target.textContent = soundEnabled ? "🔊 Дыбыс: Қосу" : "🔇 Дыбыс: Өшіру";
+        };
+        
+        loadQuestion();
+    </script>
+</body>
+</html>

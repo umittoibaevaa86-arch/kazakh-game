@@ -1,0 +1,616 @@
+
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Әуе шарларын жар! - Интерактивті ойын</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: radial-gradient(circle, #fbcfe8 0%, #bae6fd 100%);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .title-font {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* Neon & Glow effects */
+        .neon-border-pink {
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.7), inset 0 0 10px rgba(244, 63, 94, 0.4);
+            border-color: rgba(244, 63, 94, 0.8);
+        }
+
+        .neon-border-blue {
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.7), inset 0 0 10px rgba(14, 165, 233, 0.4);
+            border-color: rgba(14, 165, 233, 0.8);
+        }
+
+        .neon-text-pink {
+            text-shadow: 0 0 8px rgba(244, 63, 94, 0.8), 0 0 15px rgba(244, 63, 94, 0.5);
+        }
+
+        .neon-text-blue {
+            text-shadow: 0 0 8px rgba(14, 165, 233, 0.8), 0 0 15px rgba(14, 165, 233, 0.5);
+        }
+
+        .neon-btn-green {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            transition: all 0.3s ease;
+        }
+        .neon-btn-green:hover {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.9);
+            transform: scale(1.05);
+        }
+
+        .floating-item {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.12;
+            animation: floatSlow 12s infinite linear;
+            z-index: 1;
+        }
+
+        @keyframes floatSlow {
+            0% { transform: translateY(105vh) rotate(0deg) scale(0.8); }
+            50% { transform: translateY(50vh) rotate(180deg) scale(1.1) translateX(20px); }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(0.8); }
+        }
+
+        /* Balloon Graphics & Mechanics */
+        .balloon-container {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+
+        .balloon-body {
+            position: relative;
+            width: 76px;
+            height: 92px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Glossy effect highlight on balloon */
+        .balloon-body::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 20px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            transform: rotate(-30deg);
+        }
+
+        /* Small tie knot at the bottom */
+        .balloon-tie {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            margin-top: -1px;
+        }
+
+        /* Wavy balloon string */
+        .balloon-string {
+            width: 2px;
+            height: 40px;
+            background: rgba(100, 116, 139, 0.4);
+            position: relative;
+        }
+
+        /* Red/Pink Balloon (Vowel) */
+        .balloon-red .balloon-body {
+            background: radial-gradient(circle at 35% 35%, #f43f5e 20%, #be123c 100%);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.6), inset -8px -8px 15px rgba(0,0,0,0.25);
+        }
+        .balloon-red .balloon-tie {
+            border-bottom: 8px solid #be123c;
+        }
+
+        /* Blue Balloon (Consonant) */
+        .balloon-blue .balloon-body {
+            background: radial-gradient(circle at 35% 35%, #38bdf8 20%, #0369a1 100%);
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.6), inset -8px -8px 15px rgba(0,0,0,0.25);
+        }
+        .balloon-blue .balloon-tie {
+            border-bottom: 8px solid #0369a1;
+        }
+
+        /* Shake animation for wrong balloon */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-12px) rotate(-5deg); }
+            40%, 80% { transform: translateX(12px) rotate(5deg); }
+        }
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 50;
+            animation: explodeParticle 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes explodeParticle {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        /* Spark pop text */
+        .pop-text {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            font-family: 'Fredoka One', cursive;
+            animation: textRise 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes textRise {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            30% { transform: translate(-50%, -80%) scale(1.3); opacity: 1; }
+            100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="w-full h-screen flex flex-col items-center justify-between p-3 select-none relative overflow-hidden">
+
+    <!-- Background Floating School Assets -->
+    <div id="bg-decorations" class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <!-- Will be dynamically populated with animated book, pen, notebook, star, school icons -->
+    </div>
+
+    <!-- MAIN INTERFACE HEADER -->
+    <header class="w-full max-w-4xl bg-white/70 backdrop-blur-md rounded-2xl p-4 text-center border-2 border-pink-400/50 shadow-lg neon-border-pink z-10 flex flex-col items-center relative gap-2">
+        <h1 class="title-font text-3xl md:text-4xl text-rose-500 font-extrabold tracking-wide neon-text-pink">
+            🎈 Әуе шарларын жар!
+        </h1>
+        
+        <div class="w-full max-w-2xl px-2 py-1 bg-sky-100/80 rounded-xl border border-sky-200">
+            <p class="text-xs md:text-sm text-sky-800 font-bold leading-relaxed">
+                <span class="text-rose-500">🏆 Ойынның мақсаты:</span> Оқушылардың дауысты және дауыссыз дыбыстарды ажырату дағдыларын дамыту, жылдам ойлау қабілетін арттыру.
+            </p>
+        </div>
+
+        <!-- Pop instruction Banner -->
+        <div class="px-6 py-2 bg-yellow-300 border-4 border-dashed border-amber-500 text-amber-900 font-black text-lg md:text-xl rounded-full shadow-md animate-bounce">
+            🎯 Тапсырма: «Тек дауысты дыбыстарды жар!»
+        </div>
+    </header>
+
+    <!-- STATISTICS BAR (Timer, Score, HighScore) -->
+    <section class="w-full max-w-3xl flex justify-between items-center gap-2 mt-2 px-2 z-10">
+        <!-- Current Score Widget -->
+        <div class="flex-1 bg-white/80 border-2 border-emerald-400 rounded-xl p-2 flex flex-col items-center shadow-md">
+            <span class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">Ұпай</span>
+            <span id="score-val" class="text-2xl font-black text-emerald-600">0</span>
+        </div>
+
+        <!-- Timer Widget -->
+        <div class="flex-1 bg-rose-500 border-2 border-rose-300 rounded-xl p-2 flex flex-col items-center shadow-md text-white">
+            <span class="text-xs font-black uppercase tracking-wide opacity-90">Уақыт</span>
+            <span id="timer-val" class="text-2xl font-black">30с</span>
+        </div>
+
+        <!-- Best High Score Widget -->
+        <div class="flex-1 bg-white/80 border-2 border-amber-400 rounded-xl p-2 flex flex-col items-center shadow-md">
+            <span class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">Ең жоғары ұпай</span>
+            <span id="high-score-val" class="text-2xl font-black text-amber-600">0</span>
+        </div>
+    </section>
+
+    <!-- PLAY AREA -->
+    <main id="game-space" class="flex-1 w-full max-w-4xl relative overflow-hidden rounded-2xl bg-white/30 border border-white/50 my-3 shadow-inner z-10">
+        <!-- Interactive floating balloons appear and float upward in this section -->
+    </main>
+
+    <!-- START / PLAY AGAIN MODALS -->
+    <!-- Start Screen Modal -->
+    <div id="start-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border-4 border-sky-400 shadow-2xl text-center transform scale-100 transition-all">
+            <div class="text-6xl mb-4">🎈🎈🎈</div>
+            <h2 class="title-font text-3xl text-rose-500 font-black mb-2 neon-text-pink">«Әуе шарларын жар!»</h2>
+            <p class="text-slate-600 font-bold mb-6">
+                Дауысты дыбыстары бар <span class="text-rose-500 font-black">ҚЫЗЫЛ</span> шарларды жарыңыз!<br>
+                Дауыссыз дыбысы бар <span class="text-sky-500 font-black">КӨК</span> шарларға тимеңіз!
+            </p>
+            <button onclick="initiateGame()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xl rounded-2xl shadow-lg border-b-4 border-emerald-700 neon-btn-green">
+                Ойынды бастау <i class="fa-solid fa-play ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen Modal -->
+    <div id="game-over-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border-4 border-rose-400 shadow-2xl text-center">
+            <div class="text-6xl mb-4">🎉🏆🎉</div>
+            <h2 class="title-font text-3xl text-sky-500 font-black mb-2">Ойын аяқталды!</h2>
+            
+            <div class="bg-slate-50 rounded-2xl p-4 my-4 border border-slate-100 flex flex-col gap-2">
+                <p class="text-slate-600 font-bold text-lg">Жинаған ұпайыңыз: <span id="final-score" class="text-2xl text-emerald-600 font-black">0</span></p>
+                <p id="high-score-record-msg" class="text-amber-500 font-black text-sm hidden">🎊 Жаңа рекорд орнатылды! 🎊</p>
+                <p class="text-slate-500 font-bold text-sm">Үздік рекорд: <span id="final-high-score" class="font-black text-slate-800">0</span></p>
+            </div>
+
+            <button onclick="initiateGame()" class="w-full py-4 bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-xl rounded-2xl shadow-lg border-b-4 border-sky-700 transition-all hover:scale-105">
+                Қайтадан ойнау <i class="fa-solid fa-rotate-left ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- AUTHOR FOOTER SECTION -->
+    <footer class="w-full text-center py-2 z-10">
+        <span class="px-6 py-1 bg-white/70 backdrop-blur-sm border border-slate-200 text-slate-600 text-xs md:text-sm font-extrabold rounded-full shadow-sm tracking-widest uppercase">
+            Авторы: umittoibaeva
+        </span>
+    </footer>
+
+    <!-- AUDIO SYNTHESIS & GAMEPLAY LOGIC -->
+    <script>
+        // Sound generation helper via Web Audio API to bypass any external asset loads
+        let audioCtx;
+
+        function playSynthesizedSound(isCorrect) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (isCorrect) {
+                    // Delightful arcade pop sound
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+                    
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else {
+                    // Sad buzzer for incorrect pop
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+                    
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch (err) {
+                console.warn('Audio play unsuccessful', err);
+            }
+        }
+
+        // Kazakh Vowels (Дауысты) and Consonants (Дауыссыз) lists
+        const KazakhVowels = ['А', 'Ә', 'О', 'Ө', 'Ұ', 'Ү', 'Ы', 'І', 'Е', 'И', 'У', 'Э'];
+        const KazakhConsonants = ['Б', 'В', 'Г', 'Ғ', 'Д', 'Ж', 'З', 'К', 'Қ', 'Л', 'М', 'Н', 'Ң', 'П', 'Р', 'С', 'Т', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Һ'];
+
+        const positivePhrases = ['Жарайсың!', 'Тамаша!', 'Өте жақсы!', 'Ғажап!', 'Керемет!'];
+        const negativePhrases = ['Қайталап көр!', 'Мұқият бол!', 'Бұл дауыссыз дыбыс!', 'Қателестің!', 'Есіңе түсір!'];
+
+        // Game Configuration and State
+        let score = 0;
+        let bestHighScore = parseInt(localStorage.getItem('umittoibaeva_balloon_highscore')) || 0;
+        let timeLeft = 30;
+        let isGameRunning = false;
+        let balloonSpawnTimer;
+        let timerCountdownInterval;
+        let nextSpawnTime = 1000; //ms
+
+        // Query selectors
+        const gameSpace = document.getElementById('game-space');
+        const scoreVal = document.getElementById('score-val');
+        const timerVal = document.getElementById('timer-val');
+        const highScoreVal = document.getElementById('high-score-val');
+        
+        const startModal = document.getElementById('start-modal');
+        const gameOverModal = document.getElementById('game-over-modal');
+        const finalScore = document.getElementById('final-score');
+        const finalHighScore = document.getElementById('final-high-score');
+        const highScoreRecordMsg = document.getElementById('high-score-record-msg');
+
+        // Set HighScore Display
+        highScoreVal.textContent = bestHighScore;
+
+        // Create custom background decoration pieces
+        const decorations = ['📚', '✏️', '📓', '⭐', '🎒', '🎨', '🧩', '🎈'];
+        const decorContainer = document.getElementById('bg-decorations');
+        
+        for (let i = 0; i < 15; i++) {
+            const span = document.createElement('span');
+            span.className = 'floating-item';
+            span.textContent = decorations[Math.floor(Math.random() * decorations.length)];
+            span.style.left = `${Math.random() * 90}%`;
+            span.style.animationDelay = `${Math.random() * 8}s`;
+            span.style.animationDuration = `${8 + Math.random() * 12}s`;
+            span.style.fontSize = `${1.5 + Math.random() * 1.5}rem`;
+            decorContainer.appendChild(span);
+        }
+
+        // Initialize Game Loop
+        function initiateGame() {
+            // Reset States
+            score = 0;
+            timeLeft = 30;
+            scoreVal.textContent = score;
+            timerVal.textContent = `${timeLeft}с`;
+            
+            // Clean active game field
+            gameSpace.innerHTML = '';
+            
+            // UI Switch
+            startModal.classList.add('hidden');
+            gameOverModal.classList.add('hidden');
+            highScoreRecordMsg.classList.add('hidden');
+
+            isGameRunning = true;
+
+            // Trigger sound context instantiation safely
+            playSynthesizedSound(true);
+
+            // Set up Intervals
+            clearInterval(timerCountdownInterval);
+            timerCountdownInterval = setInterval(gameTimerCountdown, 1000);
+
+            // Adaptive Spawning Loop
+            clearTimeout(balloonSpawnTimer);
+            scheduleNextSpawn();
+        }
+
+        // Countdown timer process
+        function gameTimerCountdown() {
+            if (!isGameRunning) return;
+
+            timeLeft--;
+            timerVal.textContent = `${timeLeft}с`;
+
+            if (timeLeft <= 0) {
+                endTheGame();
+            }
+        }
+
+        // Adaptive Balloon Spawning Scheduling
+        function scheduleNextSpawn() {
+            if (!isGameRunning) return;
+
+            // Gradually speed up spawn speed as score or time progresses
+            const intervalSpeed = Math.max(450, 1000 - (30 - timeLeft) * 15);
+            balloonSpawnTimer = setTimeout(() => {
+                spawnInteractiveBalloon();
+                scheduleNextSpawn();
+            }, intervalSpeed);
+        }
+
+        // Create individual floating balloon element
+        function spawnInteractiveBalloon() {
+            if (!isGameRunning) return;
+
+            const isVowel = Math.random() > 0.45; // ~55% vowels, 45% consonants
+            const letter = isVowel 
+                ? KazakhVowels[Math.floor(Math.random() * KazakhVowels.length)]
+                : KazakhConsonants[Math.floor(Math.random() * KazakhConsonants.length)];
+
+            // Create nodes
+            const bContainer = document.createElement('div');
+            bContainer.className = `balloon-container ${isVowel ? 'balloon-red' : 'balloon-blue'}`;
+            
+            const bBody = document.createElement('div');
+            bBody.className = 'balloon-body';
+            bBody.textContent = letter;
+
+            const bTie = document.createElement('div');
+            bTie.className = 'balloon-tie';
+
+            const bString = document.createElement('div');
+            bString.className = 'balloon-string';
+
+            bContainer.appendChild(bBody);
+            bContainer.appendChild(bTie);
+            bContainer.appendChild(bString);
+
+            // Randomize spawn coordinates
+            const spawnX = Math.random() * (gameSpace.clientWidth - 85);
+            bContainer.style.left = `${spawnX}px`;
+            bContainer.style.bottom = `-140px`;
+
+            gameSpace.appendChild(bContainer);
+
+            // Floating movement settings
+            const verticalSpeed = 1.6 + Math.random() * 2.2 + ((30 - timeLeft) * 0.08); // Speed up slowly with time
+            let currentY = -140;
+
+            function animateFloating() {
+                if (!isGameRunning) {
+                    bContainer.remove();
+                    return;
+                }
+
+                currentY += verticalSpeed;
+                bContainer.style.transform = `translateY(${-currentY}px)`;
+
+                // Remove when floating past container top
+                if (currentY > (gameSpace.clientHeight + 160)) {
+                    bContainer.remove();
+                } else {
+                    requestAnimationFrame(animateFloating);
+                }
+            }
+
+            requestAnimationFrame(animateFloating);
+
+            // Handle Pop Actions (Both click and touch support)
+            const handlePopAction = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (bContainer.classList.contains('popping') || bContainer.classList.contains('shake-animation')) return;
+
+                const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+                const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+
+                if (isVowel) {
+                    // Correct Move
+                    bContainer.classList.add('popping');
+                    score += 10;
+                    scoreVal.textContent = score;
+
+                    playSynthesizedSound(true);
+                    triggerExplosion(clientX, clientY, isVowel);
+                    triggerFeedback(clientX, clientY, true);
+                    bContainer.remove();
+                } else {
+                    // Wrong Move
+                    score = Math.max(0, score - 5);
+                    scoreVal.textContent = score;
+
+                    playSynthesizedSound(false);
+                    triggerFeedback(clientX, clientY, false);
+
+                    // Physical feedback animation
+                    bContainer.classList.add('shake-animation');
+                    setTimeout(() => {
+                        bContainer.classList.remove('shake-animation');
+                    }, 400);
+                }
+            };
+
+            bContainer.addEventListener('mousedown', handlePopAction);
+            bContainer.addEventListener('touchstart', handlePopAction, { passive: false });
+        }
+
+        // Pop feedback text element overlay
+        function triggerFeedback(clientX, clientY, isCorrect) {
+            const textElement = document.createElement('div');
+            const feedbackText = isCorrect 
+                ? positivePhrases[Math.floor(Math.random() * positivePhrases.length)]
+                : negativePhrases[Math.floor(Math.random() * negativePhrases.length)];
+
+            textElement.className = `pop-text text-xl md:text-2xl font-black px-4 py-2 rounded-2xl shadow-lg border-2 ${
+                isCorrect 
+                    ? 'bg-emerald-100 border-emerald-400 text-emerald-700 neon-text-green' 
+                    : 'bg-rose-100 border-rose-400 text-rose-700 neon-text-pink'
+            }`;
+            
+            textElement.textContent = feedbackText;
+
+            // Safely coordinate within screen limits
+            const realX = clientX ? clientX : (window.innerWidth / 2);
+            const realY = clientY ? clientY : (window.innerHeight / 2);
+
+            textElement.style.left = `${realX}px`;
+            textElement.style.top = `${realY}px`;
+
+            document.body.appendChild(textElement);
+
+            setTimeout(() => {
+                textElement.remove();
+            }, 1000);
+        }
+
+        // Particle effect logic for stars popping out
+        function triggerExplosion(clientX, clientY, isVowel) {
+            const particleCount = 14;
+            const targetColor = isVowel ? '#f43f5e' : '#38bdf8';
+            const realX = clientX ? clientX : (window.innerWidth / 2);
+            const realY = clientY ? clientY : (window.innerHeight / 2);
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Choose between star character or customized vector dot
+                particle.textContent = Math.random() > 0.4 ? '⭐' : '✨';
+                particle.style.color = Math.random() > 0.5 ? '#f59e0b' : targetColor;
+                particle.style.fontSize = `${12 + Math.random() * 18}px`;
+                
+                particle.style.left = `${realX}px`;
+                particle.style.top = `${realY}px`;
+
+                // Exploding trajectories
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 120;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+
+                particle.style.setProperty('--dx', `${dx}px`);
+                particle.style.setProperty('--dy', `${dy}px`);
+
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 800);
+            }
+        }
+
+        // Game Over Handler
+        function endTheGame() {
+            isGameRunning = false;
+            clearTimeout(balloonSpawnTimer);
+            clearInterval(timerCountdownInterval);
+
+            // High Score Computation
+            let hasNewHighScore = false;
+            if (score > bestHighScore) {
+                bestHighScore = score;
+                localStorage.setItem('umittoibaeva_balloon_highscore', bestHighScore);
+                highScoreVal.textContent = bestHighScore;
+                hasNewHighScore = true;
+            }
+
+            // Populate game over modal contents
+            finalScore.textContent = score;
+            finalHighScore.textContent = bestHighScore;
+
+            if (hasNewHighScore && score > 0) {
+                highScoreRecordMsg.classList.remove('hidden');
+            } else {
+                highScoreRecordMsg.classList.add('hidden');
+            }
+
+            // Open Modal
+            gameOverModal.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

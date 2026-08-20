@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Sort Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow: hidden; background: linear-gradient(135deg, #FFFFFF 0%, #EAF8FF 30%, #E8E3FF 70%, #BFE6FF 100%); }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); border: 2px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1); }
+        .btn-neon { transition: all 0.3s ease; border: 2px solid transparent; }
+        .btn-neon:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); border-color: #60a5fa; }
+        .correct-glow { animation: pulseGreen 0.6s ease-in-out; }
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0px rgba(34, 197, 94, 0); } 50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.6); } 100% { box-shadow: 0 0 0px rgba(34, 197, 94, 0); } }
+        .shake-err { animation: shake 0.4s ease-in-out; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .text-blue-custom { color: #1E3A8A; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4">
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="game-container" class="w-full max-w-4xl relative z-10 flex flex-col items-center">
+        <div id="start-screen" class="glass p-12 text-center rounded-3xl border-white/50 w-full max-w-xl">
+            <h1 class="text-5xl font-bold text-blue-800 mb-6">📚 Word Sort Master</h1>
+            <p class="text-xl mb-8 text-blue-700">Дұрыс жазылу ережесін анықта!</p>
+            <button onclick="startGame()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-full text-2xl shadow-xl transition-all btn-neon">БАСТАУ</button>
+        </div>
+
+        <div id="quiz-ui" class="hidden w-full">
+            <div class="text-center mb-6"><p id="task-text" class="text-2xl font-bold text-blue-800">Сөздерді дұрыс бағанға орналастыр.</p></div>
+            <div class="glass p-4 rounded-2xl flex justify-between items-center mb-6 shadow-lg">
+                <div class="flex gap-6 font-bold text-blue-900">
+                    <span>XP: <span id="xp" class="text-blue-700">0</span></span>
+                    <span>Score: <span id="score" class="text-blue-700">0</span></span>
+                </div>
+                <div id="progress-text" class="font-bold text-blue-900">1 / 37</div>
+            </div>
+
+            <div id="word-card" class="glass p-10 rounded-3xl text-center mb-8 mx-auto w-full max-w-lg shadow-2xl transition-all">
+                <h2 id="word-text" class="text-4xl font-bold text-blue-800 mb-4">Сөз...</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <button onclick="checkAnswer('birge')" class="glass p-6 rounded-2xl text-xl font-bold btn-neon text-blue-800 border-2 border-blue-200">🟦 БІРГЕ</button>
+                <button onclick="checkAnswer('bolek')" class="glass p-6 rounded-2xl text-xl font-bold btn-neon text-blue-800 border-2 border-blue-200">🟩 БӨЛЕК</button>
+                <button onclick="checkAnswer('defis')" class="glass p-6 rounded-2xl text-xl font-bold btn-neon text-blue-800 border-2 border-blue-200">🟨 ДЕФИС</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-4 text-blue-800 font-semibold italic">Авторы: umittoibaeva</footer>
+
+    <script>
+        // Дыбыс эффектілерін синтездеу (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            if (type === 'correct') {
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            } else {
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            }
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const icons = ['📚', '📖', '✏️', '📝', '🎓', '🌍', '🧮', '📐', 'Ә', 'Ө', 'Ұ', '💡', '⭐'];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize; resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+                this.size = Math.random() * 25 + 15;
+                this.icon = icons[Math.floor(Math.random() * icons.length)];
+                this.alpha = 0.15;
+            }
+            update() { this.x += this.vx; this.y += this.vy; if(this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset(); }
+            draw() { ctx.globalAlpha = this.alpha; ctx.font = `${this.size}px Nunito`; ctx.fillText(this.icon, this.x, this.y); }
+        }
+        for(let i=0; i<40; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        const data = [
+            { w: "Абыр (күбір)", cat: "defis" }, { w: "Авиа (апат)", cat: "birge" }, { w: "Авиа (зауыт)", cat: "birge" }, 
+            { w: "Авто (бекет)", cat: "birge" }, { w: "Авто (жол)", cat: "birge" }, { w: "Ағайын (жегжат)", cat: "defis" },
+            { w: "Ағаш (үй)", cat: "bolek" }, { w: "Ағаш (тарақ)", cat: "bolek" }, { w: "Ағаш (көмір)", cat: "bolek" },
+            { w: "Ағып (таму)", cat: "defis" }, { w: "Адал (ақы)", cat: "bolek" }, { w: "Адам (күн)", cat: "bolek" },
+            { w: "Адам (сағат)", cat: "bolek" }, { w: "Азу (ағаш)", cat: "bolek" }, { w: "Азу (тіс)", cat: "bolek" },
+            { w: "Айыл (тартпа)", cat: "defis" }, { w: "Айыр (көмей)", cat: "bolek" }, { w: "Ақ (бата)", cat: "bolek" },
+            { w: "Ақ (бидай)", cat: "bolek" }, { w: "Ақ (бөкен)", cat: "birge" }, { w: "Ақ (желек)", cat: "bolek" },
+            { w: "Ақ (жол)", cat: "bolek" }, { w: "Алма (ағаш)", cat: "bolek" }, { w: "Алма (кезек)", cat: "defis" },
+            { w: "Арпа (бидай)", cat: "defis" }, { w: "Арпа (шөп)", cat: "bolek" }, { w: "Ауыз (су)", cat: "bolek" },
+            { w: "Ауыз (үй)", cat: "bolek" }, { w: "Ашық (хат)", cat: "bolek" }, { w: "Аэро (сурет)", cat: "birge" },
+            { w: "Аэро (флот)", cat: "birge" }, { w: "Әзіл (ажуа)", cat: "defis" }, { w: "Әлде (бір)", cat: "birge" },
+            { w: "Әр (кез)", cat: "birge" }, { w: "Әр (қашан)", cat: "birge" }, { w: "Әулие (әнбие)", cat: "defis" },
+            { w: "Алмалы (салмалы)", cat: "defis" }
+        ].sort(() => Math.random() - 0.5);
+
+        let state = { index: 0, score: 0, xp: 0, results: { birge: [], bolek: [], defis: [] } };
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-ui').classList.remove('hidden');
+            renderWord();
+        }
+
+        function renderWord() {
+            if (state.index >= data.length) { endGame(); return; }
+            const card = document.getElementById('word-card');
+            card.classList.remove('correct-glow');
+            document.getElementById('word-text').innerText = data[state.index].w;
+            document.getElementById('progress-text').innerText = `${state.index + 1} / ${data.length}`;
+        }
+
+        function checkAnswer(cat) {
+            const current = data[state.index];
+            const card = document.getElementById('word-card');
+            if (current.cat === cat) {
+                state.score += 10; state.xp += 100;
+                state.results[cat].push(current.w);
+                document.getElementById('score').innerText = state.score;
+                document.getElementById('xp').innerText = state.xp;
+                card.classList.add('correct-glow');
+                playSound('correct');
+            } else {
+                card.classList.add('shake-err');
+                playSound('error');
+                setTimeout(() => card.classList.remove('shake-err'), 400);
+            }
+            state.index++;
+            setTimeout(renderWord, 600);
+        }
+
+        function endGame() {
+            document.getElementById('quiz-ui').innerHTML = `<div class="glass p-10 rounded-3xl w-full text-center">
+                <h2 class="text-4xl font-bold text-blue-800 mb-8">Жеңіс! 🏆</h2>
+                <div class="grid grid-cols-3 gap-6 text-sm text-blue-900">
+                    <div><h3 class="font-bold mb-3">БІРГЕ</h3>${state.results.birge.map(w => `<p>${w}</p>`).join('')}</div>
+                    <div><h3 class="font-bold mb-3">БӨЛЕК</h3>${state.results.bolek.map(w => `<p>${w}</p>`).join('')}</div>
+                    <div><h3 class="font-bold mb-3">ДЕФИС</h3>${state.results.defis.map(w => `<p>${w}</p>`).join('')}</div>
+                </div>
+                <button onclick="location.reload()" class="mt-10 bg-blue-600 text-white px-10 py-4 rounded-full font-bold btn-neon">Қайталау</button>
+            </div>`;
+        }
+    </script>
